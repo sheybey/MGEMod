@@ -204,30 +204,30 @@ char
 	g_sBBallParticleBlue[64];
 
 static const char stockSounds[][] = { // Sounds that do not need to be downloaded.		
-	"vo/intel_teamcaptured.wav",
-	"vo/intel_teamdropped.wav",
-	"vo/intel_teamstolen.wav",
-	"vo/intel_enemycaptured.wav",
-	"vo/intel_enemydropped.wav",
-	"vo/intel_enemystolen.wav",
-	"vo/announcer_ends_5sec.wav",
-	"vo/announcer_ends_4sec.wav",
-	"vo/announcer_ends_3sec.wav",
-	"vo/announcer_ends_2sec.wav",
-	"vo/announcer_ends_1sec.wav",
-	"vo/announcer_ends_10sec.wav",
-	"vo/announcer_control_point_warning.wav",
-	"vo/announcer_control_point_warning2.wav",
-	"vo/announcer_control_point_warning3.wav",
-	"vo/announcer_overtime.wav",
-	"vo/announcer_overtime2.wav",
-	"vo/announcer_overtime3.wav",
-	"vo/announcer_overtime4.wav",
-	"vo/announcer_we_captured_control.wav",
-	"vo/announcer_we_lost_control.wav",
-	"items/spawn_item.wav",
-	"vo/announcer_victory.wav",
-	"vo/announcer_you_failed.wav"
+	"vo/intel_teamcaptured.mp3",
+	"vo/intel_teamdropped.mp3",
+	"vo/intel_teamstolen.mp3",
+	"vo/intel_enemycaptured.mp3",
+	"vo/intel_enemydropped.mp3",
+	"vo/intel_enemystolen.mp3",
+	"vo/announcer_ends_5sec.mp3",
+	"vo/announcer_ends_4sec.mp3",
+	"vo/announcer_ends_3sec.mp3",
+	"vo/announcer_ends_2sec.mp3",
+	"vo/announcer_ends_1sec.mp3",
+	"vo/announcer_ends_10sec.mp3",
+	"vo/announcer_control_point_warning.mp3",
+	"vo/announcer_control_point_warning2.mp3",
+	"vo/announcer_control_point_warning3.mp3",
+	"vo/announcer_overtime.mp3",
+	"vo/announcer_overtime2.mp3",
+	"vo/announcer_overtime3.mp3",
+	"vo/announcer_overtime4.mp3",
+	"vo/announcer_we_captured_control.mp3",
+	"vo/announcer_we_lost_control.mp3",
+	"vo/announcer_victory.mp3",
+	"vo/announcer_you_failed.mp3",
+	"items/spawn_item.wav"
 };
 
 public Plugin myinfo = {
@@ -1069,16 +1069,16 @@ public Action OnTouchHoop(int entity, int other) {
 			ShowPlayerHud(foe_teammate);
 		}
 			
-		EmitSoundToClient(client, "vo/intel_teamcaptured.wav");
-		EmitSoundToClient(foe, "vo/intel_enemycaptured.wav");
+		EmitSoundToClient(client, "vo/intel_teamcaptured.mp3");
+		EmitSoundToClient(foe, "vo/intel_enemycaptured.mp3");
 		
 		if (g_bFourPersonArena[arena_index]) {
 			//This shouldn't be necessary but I'm getting invalid clients for some reason.
 			if (IsValidClient(client_teammate)) {
-				EmitSoundToClient(client_teammate, "vo/intel_teamcaptured.wav");
+				EmitSoundToClient(client_teammate, "vo/intel_teamcaptured.mp3");
 			}
 			if (IsValidClient(foe_teammate)) {
-				EmitSoundToClient(foe_teammate, "vo/intel_enemycaptured.wav");
+				EmitSoundToClient(foe_teammate, "vo/intel_enemycaptured.mp3");
 			}
 		}
 			
@@ -1136,20 +1136,20 @@ public Action OnTouchIntel(int entity, int other) {
 	}
 
 	ShowPlayerHud(client);
-	EmitSoundToClient(client, "vo/intel_teamstolen.wav");
+	EmitSoundToClient(client, "vo/intel_teamstolen.mp3");
 
 	int foe = g_iArenaQueue[g_iPlayerArena[client]][(g_iPlayerSlot[client]==SLOT_ONE || g_iPlayerSlot[client]==SLOT_THREE) ? SLOT_TWO : SLOT_ONE];
 	
 	
 	if (IsValidClient(foe)) {
-		EmitSoundToClient(foe, "vo/intel_enemystolen.wav");
+		EmitSoundToClient(foe, "vo/intel_enemystolen.mp3");
 		ShowPlayerHud(foe);
 	}
 	
 	if (g_bFourPersonArena[g_iPlayerArena[client]]) {
 		int foe2 = g_iArenaQueue[g_iPlayerArena[client]][(g_iPlayerSlot[client]==SLOT_ONE || g_iPlayerSlot[client]==SLOT_THREE) ? SLOT_FOUR : SLOT_THREE];
 		if (IsValidClient(foe2)) {
-			EmitSoundToClient(foe2, "vo/intel_enemystolen.wav");
+			EmitSoundToClient(foe2, "vo/intel_enemystolen.mp3");
 			ShowPlayerHud(foe2);
 		}
 	}
@@ -3286,7 +3286,7 @@ public Action Command_DropItem(int client, const char[] command, argc) {
 			SDKHook(g_iBBallIntel[arena_index], SDKHook_StartTouch, OnTouchIntel);
 			AcceptEntityInput(g_iBBallIntel[arena_index], "Enable");
 
-			EmitSoundToClient(client, "vo/intel_teamdropped.wav");
+			EmitSoundToClient(client, "vo/intel_teamdropped.mp3");
 			
 			RemoveClientParticle(client);
 			
@@ -3773,9 +3773,9 @@ public Action Event_PlayerDeath(Handle event, const char[] name, bool dontBroadc
 				SDKHook(g_iBBallIntel[arena_index], SDKHook_StartTouch, OnTouchIntel);
 				AcceptEntityInput(g_iBBallIntel[arena_index], "Enable");
 
-				EmitSoundToClient(victim, "vo/intel_teamdropped.wav");
+				EmitSoundToClient(victim, "vo/intel_teamdropped.mp3");
 				if (IsValidClient(killer)) {
-					EmitSoundToClient(killer, "vo/intel_enemydropped.wav");
+					EmitSoundToClient(killer, "vo/intel_enemydropped.mp3");
 				}
 					
 			}
@@ -4468,11 +4468,11 @@ public Action Timer_CountDownKoth(Handle timer, any arena_index) {
 			char SoundFileTemp[64];
 			int num = GetRandomInt(1, 3);
 			if (num == 1) {
-				SoundFileTemp = "vo/announcer_control_point_warning.wav";
+				SoundFileTemp = "vo/announcer_control_point_warning.mp3";
 			} else if (num == 2) {
-				SoundFileTemp = "vo/announcer_control_point_warning2.wav";
+				SoundFileTemp = "vo/announcer_control_point_warning2.mp3";
 			} else {
-				SoundFileTemp = "vo/announcer_control_point_warning3.wav";
+				SoundFileTemp = "vo/announcer_control_point_warning3.mp3";
 			}
 			
 			if (g_iCappingTeam[arena_index] == TEAM_BLU) {
@@ -4531,44 +4531,44 @@ public Action Timer_CountDownKoth(Handle timer, any arena_index) {
 			blu2 = g_iArenaQueue[arena_index][SLOT_FOUR];
 			if (g_iPointState[arena_index] == TEAM_RED) {
 				if (IsValidClient(red1)) {
-					EmitSoundToClient(red1, "vo/announcer_we_lost_control.wav");
+					EmitSoundToClient(red1, "vo/announcer_we_lost_control.mp3");
 				}
 				if (IsValidClient(red2)) {
-					EmitSoundToClient(red2, "vo/announcer_we_lost_control.wav");
+					EmitSoundToClient(red2, "vo/announcer_we_lost_control.mp3");
 				}
 				if (IsValidClient(blu1)) {
-					EmitSoundToClient(blu1, "vo/announcer_we_captured_control.wav");
+					EmitSoundToClient(blu1, "vo/announcer_we_captured_control.mp3");
 				}
 				if (IsValidClient(blu2)) {
-					EmitSoundToClient(blu2, "vo/announcer_we_captured_control.wav");
+					EmitSoundToClient(blu2, "vo/announcer_we_captured_control.mp3");
 				}
 					
 				g_iCappingTeam[arena_index] = TEAM_RED;
 				g_iPointState[arena_index] = TEAM_BLU;
 			} else if (g_iPointState[arena_index] == TEAM_BLU) {
 				if (IsValidClient(red1)) {
-					EmitSoundToClient(red1, "vo/announcer_we_captured_control.wav");
+					EmitSoundToClient(red1, "vo/announcer_we_captured_control.mp3");
 				}
 				if (IsValidClient(red2)) {
-					EmitSoundToClient(red2, "vo/announcer_we_captured_control.wav");
+					EmitSoundToClient(red2, "vo/announcer_we_captured_control.mp3");
 				}
 				if (IsValidClient(blu1)) {
-					EmitSoundToClient(blu1, "vo/announcer_we_lost_control.wav");
+					EmitSoundToClient(blu1, "vo/announcer_we_lost_control.mp3");
 				}
 				if (IsValidClient(blu2)) {
-					EmitSoundToClient(blu2, "vo/announcer_we_lost_control.wav");
+					EmitSoundToClient(blu2, "vo/announcer_we_lost_control.mp3");
 				}
 				g_iCappingTeam[arena_index] = TEAM_BLU;
 				g_iPointState[arena_index] = TEAM_RED;
 			} else {
 				if (g_iCappingTeam[arena_index] == TEAM_RED) {
-					EmitSoundToClient(red1, "vo/announcer_we_captured_control.wav");
-					EmitSoundToClient(red2, "vo/announcer_we_captured_control.wav");
+					EmitSoundToClient(red1, "vo/announcer_we_captured_control.mp3");
+					EmitSoundToClient(red2, "vo/announcer_we_captured_control.mp3");
 					g_iPointState[arena_index] = TEAM_RED;
 					g_iCappingTeam[arena_index] = TEAM_BLU;
 				} else {
-					EmitSoundToClient(blu1, "vo/announcer_we_captured_control.wav");
-					EmitSoundToClient(blu2, "vo/announcer_we_captured_control.wav");
+					EmitSoundToClient(blu1, "vo/announcer_we_captured_control.mp3");
+					EmitSoundToClient(blu2, "vo/announcer_we_captured_control.mp3");
 					g_iPointState[arena_index] = TEAM_BLU;
 					g_iCappingTeam[arena_index] = TEAM_RED;
 				}
@@ -4577,22 +4577,22 @@ public Action Timer_CountDownKoth(Handle timer, any arena_index) {
 			red1 = g_iArenaQueue[arena_index][SLOT_ONE];
 			blu1 = g_iArenaQueue[arena_index][SLOT_TWO];
 			if (g_iPointState[arena_index] == TEAM_RED) {
-				EmitSoundToClient(red1, "vo/announcer_we_lost_control.wav");
-				EmitSoundToClient(blu1, "vo/announcer_we_captured_control.wav");
+				EmitSoundToClient(red1, "vo/announcer_we_lost_control.mp3");
+				EmitSoundToClient(blu1, "vo/announcer_we_captured_control.mp3");
 				g_iCappingTeam[arena_index] = TEAM_RED;
 				g_iPointState[arena_index] = TEAM_BLU;
 			} else if (g_iPointState[arena_index] == TEAM_BLU) {
-				EmitSoundToClient(red1, "vo/announcer_we_captured_control.wav");
-				EmitSoundToClient(blu1, "vo/announcer_we_lost_control.wav");
+				EmitSoundToClient(red1, "vo/announcer_we_captured_control.mp3");
+				EmitSoundToClient(blu1, "vo/announcer_we_lost_control.mp3");
 				g_iCappingTeam[arena_index] = TEAM_BLU;
 				g_iPointState[arena_index] = TEAM_RED;
 			} else {
 				if (g_iCappingTeam[arena_index] == TEAM_RED) {
-					EmitSoundToClient(red1, "vo/announcer_we_captured_control.wav");
+					EmitSoundToClient(red1, "vo/announcer_we_captured_control.mp3");
 					g_iPointState[arena_index] = TEAM_RED;
 					g_iCappingTeam[arena_index] = TEAM_BLU;
 				} else {
-					EmitSoundToClient(blu1, "vo/announcer_we_captured_control.wav");
+					EmitSoundToClient(blu1, "vo/announcer_we_captured_control.mp3");
 					g_iPointState[arena_index] = TEAM_BLU;
 					g_iCappingTeam[arena_index] = TEAM_RED;
 				}
@@ -4628,22 +4628,22 @@ public Action Timer_CountDownKoth(Handle timer, any arena_index) {
 		char SoundFile[64];
 		switch(g_iKothTimer[arena_index][g_iPointState[arena_index]]) {
 			case 5 : {
-				SoundFile = "vo/announcer_ends_5sec.wav";
+				SoundFile = "vo/announcer_ends_5sec.mp3";
 			}
 			case 4 : {
-				SoundFile = "vo/announcer_ends_4sec.wav";
+				SoundFile = "vo/announcer_ends_4sec.mp3";
 			}
 			case 3 : {
-				SoundFile = "vo/announcer_ends_3sec.wav";
+				SoundFile = "vo/announcer_ends_3sec.mp3";
 			}
 			case 2 : {
-				SoundFile = "vo/announcer_ends_2sec.wav";
+				SoundFile = "vo/announcer_ends_2sec.mp3";
 			}
 			case 1 : {
-				SoundFile = "vo/announcer_ends_1sec.wav";
+				SoundFile = "vo/announcer_ends_1sec.mp3";
 			}
 			default : {
-				SoundFile = "vo/announcer_ends_5sec.wav";
+				SoundFile = "vo/announcer_ends_5sec.mp3";
 			}
 		}
 		
@@ -4681,13 +4681,13 @@ public Action Timer_CountDownKoth(Handle timer, any arena_index) {
 			int num = GetRandomInt(1, 4);
 			char SoundFileTemp[64];
 			if (num == 1) {
-				SoundFileTemp = "vo/announcer_overtime.wav";
+				SoundFileTemp = "vo/announcer_overtime.mp3";
 			} else if (num == 2) {
-				SoundFileTemp = "vo/announcer_overtime2.wav";
+				SoundFileTemp = "vo/announcer_overtime2.mp3";
 			} else if (num == 3) {
-				SoundFileTemp = "vo/announcer_overtime3.wav";
+				SoundFileTemp = "vo/announcer_overtime3.mp3";
 			} else {
-				SoundFileTemp = "vo/announcer_overtime4.wav";
+				SoundFileTemp = "vo/announcer_overtime4.mp3";
 			}
 			EmitSoundToClient(blu1, SoundFileTemp);
 			EmitSoundToClient(red1, SoundFileTemp);
@@ -5136,12 +5136,12 @@ public void PlayEndgameSoundsToArena(any arena_index, any winner_team) {
 	
 	//If the red team won
 	if (winner_team == 1) {
-		SoundFileRed = "vo/announcer_victory.wav";
-		SoundFileBlu = "vo/announcer_you_failed.wav";
+		SoundFileRed = "vo/announcer_victory.mp3";
+		SoundFileBlu = "vo/announcer_you_failed.mp3";
 	//Else the blu team won
 	} else {
-		SoundFileBlu = "vo/announcer_victory.wav";
-		SoundFileRed = "vo/announcer_you_failed.wav";
+		SoundFileBlu = "vo/announcer_victory.mp3";
+		SoundFileRed = "vo/announcer_you_failed.mp3";
 	}
 	if (IsValidClient(red_1)) {
 		EmitSoundToClient(red_1, SoundFileRed);
