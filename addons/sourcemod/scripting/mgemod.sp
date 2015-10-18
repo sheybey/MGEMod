@@ -2290,7 +2290,7 @@ void SetPlayerToAllowedClass(int client, int arena_index) {// If a player's clas
 					client_teammate = getTeammate(client, g_iPlayerSlot[client], arena_index);
 					if (view_as<TFClassType>(i) == g_tfctPlayerClass[client_teammate]) {
 						//Tell the player what he did wrong
-						CPrintToChat(client, "Your team already has that class!");
+						CPrintToChat(client, "%t", "TeamAlreadyHasClass");
 						//Set his class to the only one available
 						if (g_tfctPlayerClass[client_teammate] == TF2_GetClass("soldier")) {
 							g_tfctPlayerClass[client] = TF2_GetClass("medic");
@@ -2371,7 +2371,7 @@ void RemoveClientParticle(int client) {
 
 // ====[ SWAP MENU ]=====================================================
 void ShowSwapMenu(int client) {
-	if (client<=0) {
+	if (client <= 0) {
 		return;
 	}
 		
@@ -2379,7 +2379,7 @@ void ShowSwapMenu(int client) {
 
 	Handle menu = CreateMenu(SwapMenuHandler);
 	
-	Format(title, sizeof(title), "Would you like to swap classes with your teammate?", client);
+	Format(title, sizeof(title), "%T", "MenuSwap", client);
 	SetMenuTitle(menu, title);
 	AddMenuItem(menu, "yes", "Yes");
 	AddMenuItem(menu, "no", "No");
@@ -2845,7 +2845,7 @@ public Action Command_JoinClass(int client, int args) {
 					//and you try to join as the same class as your teammate
 					if (new_class == g_tfctPlayerClass[client_teammate]) {
 						//Tell the player what he did wrong
-						CPrintToChat(client, "Your team already has that class!");
+						CPrintToChat(client, "%t", "TeamAlreadyHasClass");
 						return Plugin_Handled;
 					} else {
 						TF2_SetPlayerClass(client, new_class);
@@ -2871,7 +2871,7 @@ public Action Command_JoinClass(int client, int args) {
 				//and you try to join as the same class as your teammate
 				if (new_class == g_tfctPlayerClass[client_teammate]) {
 					//Tell the player what he did wrong
-					CPrintToChat(client, "Your team already has that class!");
+					CPrintToChat(client, "%t", "TeamAlreadyHasClass");
 					return Plugin_Handled;
 				} else {
 					TF2_SetPlayerClass(client, new_class);

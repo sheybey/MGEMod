@@ -1,6 +1,6 @@
 ﻿// colors:
 // player names - {lightgreen}
-// arena name - {greeen}
+// arena name - {green}
 // info/tip - {olive}
 // numbers - {green}
 
@@ -13,6 +13,10 @@
 	"MenuRemove" //No colors here.
 	{
 		"en"			"Remove from queue"
+	}
+	"MenuSwap" //No colors here.
+	{
+		"en"			"Would you like to swap classes with your teammate?"
 	}
 	"HPLeft"
 	{
@@ -70,6 +74,10 @@
 	"ClassIsNotAllowed"
 	{
 		"en"			"{olive}This class is not allowed!"
+	}
+	"TeamAlreadyHasClass"
+	{
+		"en"			"{olive}Your team already has that class!"
 	}
 	"LowRating"
 	{
