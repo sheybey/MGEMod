@@ -14,6 +14,10 @@
 	{
 		"de"			"Aus Warteschlange entfernen"
 	}
+	"MenuSwap" //No colors here.
+	{
+		"de"			"Möchten Sie mit Ihren Teamkollegen Klassen tauschen?" //This string was translated with Google Translate and needs to be updated.
+	}
 	"HPLeft"
 	{
 		"#format"		"{1:i}"
@@ -70,6 +74,10 @@
 	"ClassIsNotAllowed"
 	{
 		"de"			"{olive}Diese Klasse ist nicht erlaubt!"
+	}
+	"TeamAlreadyHasClass"
+	{
+		"de"			"{olive}Ihr Team hat bereits diese Klasse!" //This string was translated with Google Translate and needs to be updated.
 	}
 	"LowRating"
 	{

@@ -1,6 +1,6 @@
 ﻿// colors:
 // player names - {lightgreen}
-// arena name - {greeen}
+// arena name - {green}
 // info/tip - {olive}
 // numbers - {green}
 
@@ -13,6 +13,10 @@
     "MenuRemove" //No colors here.
     {
         "chi"           "退出队列"
+    }
+    "MenuSwap" //No colors here.
+    {
+        "chi"            "你想换班级，你的队友？" //This string was translated with Google Translate and needs to be updated.
     }
     "HPLeft"
     {
@@ -70,6 +74,10 @@
     "ClassIsNotAllowed"
     {
         "chi"           "{olive}不允许使用该职业。"
+    }
+    "TeamAlreadyHasClass"
+    {
+        "chi"            "{olive}你的团队已经具备了一流的！" //This string was translated with Google Translate and needs to be updated.
     }
     "LowRating"
     {

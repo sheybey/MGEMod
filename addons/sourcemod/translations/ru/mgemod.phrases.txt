@@ -1,18 +1,22 @@
 // colors:
 // player names - {lightgreen}
-// arena name - {greeen}
+// arena name - {green}
 // info/tip - {olive}
 // numbers - {green}
 
 "Phrases"
 {
-	"MenuTitle" //no colors here
+	"MenuTitle" //No colors here.
 	{
 		"ru"			"Выберите арену..."
 	}
-	"MenuRemove" //no colors here
+	"MenuRemove" //No colors here.
 	{
 		"ru"			"Удалиться с арены"
+	}
+	"MenuSwap" //No colors here.
+	{
+		"ru"			"Хотите поменять классы с товарищем по команде?" //This string was translated with Google Translate and needs to be updated.
 	}
 	"HPLeft"
 	{
@@ -70,6 +74,10 @@
 	"ClassIsNotAllowed"
 	{
 		"ru"			"{olive}Этот класс не разрешен!"
+	}
+	"TeamAlreadyHasClass"
+	{
+		"ru"			"{olive}Ваша команда уже имеет этот класс!" //This string was translated with Google Translate and needs to be updated.
 	}
 	"LowRating"
 	{

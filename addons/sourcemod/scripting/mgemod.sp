@@ -563,7 +563,7 @@ public void OnClientDisconnect(int client) {
 		int arena_index = g_iPlayerArena[client],
 			player_slot = g_iPlayerSlot[client],
 			after_leaver_slot = player_slot + 1,
-			foe_slot = (player_slot==SLOT_ONE || player_slot==SLOT_THREE) ? SLOT_TWO : SLOT_ONE,
+			foe_slot = (player_slot == SLOT_ONE || player_slot == SLOT_THREE) ? SLOT_TWO : SLOT_ONE,
 			foe = g_iArenaQueue[arena_index][foe_slot];
 			
 		//Turn all this logic into a helper method	
@@ -980,7 +980,7 @@ public Action OnTouchHoop(int entity, int other) {
 	int arena_index = g_iPlayerArena[client];
 	int fraglimit = g_iArenaFraglimit[arena_index];
 	int client_slot = g_iPlayerSlot[client];
-	int foe_slot = (client_slot==SLOT_ONE || client_slot==SLOT_THREE) ? SLOT_TWO : SLOT_ONE;
+	int foe_slot = (client_slot == SLOT_ONE || client_slot == SLOT_THREE) ? SLOT_TWO : SLOT_ONE;
 	int foe = g_iArenaQueue[arena_index][foe_slot];
 	int client_teammate;
 	int foe_teammate;
@@ -1140,7 +1140,7 @@ public Action OnTouchIntel(int entity, int other) {
 	ShowPlayerHud(client);
 	EmitSoundToClient(client, "vo/intel_teamstolen.mp3");
 
-	int foe = g_iArenaQueue[g_iPlayerArena[client]][(g_iPlayerSlot[client]==SLOT_ONE || g_iPlayerSlot[client]==SLOT_THREE) ? SLOT_TWO : SLOT_ONE];
+	int foe = g_iArenaQueue[g_iPlayerArena[client]][(g_iPlayerSlot[client] == SLOT_ONE || g_iPlayerSlot[client] == SLOT_THREE) ? SLOT_TWO : SLOT_ONE];
 	
 	
 	if (IsValidClient(foe)) {
@@ -1149,7 +1149,7 @@ public Action OnTouchIntel(int entity, int other) {
 	}
 	
 	if (g_bFourPersonArena[g_iPlayerArena[client]]) {
-		int foe2 = g_iArenaQueue[g_iPlayerArena[client]][(g_iPlayerSlot[client]==SLOT_ONE || g_iPlayerSlot[client]==SLOT_THREE) ? SLOT_FOUR : SLOT_THREE];
+		int foe2 = g_iArenaQueue[g_iPlayerArena[client]][(g_iPlayerSlot[client] == SLOT_ONE || g_iPlayerSlot[client] == SLOT_THREE) ? SLOT_FOUR : SLOT_THREE];
 		if (IsValidClient(foe2)) {
 			EmitSoundToClient(foe2, "vo/intel_enemystolen.mp3");
 			ShowPlayerHud(foe2);
@@ -1297,7 +1297,7 @@ void ShowPlayerHud(int client) {
 	// HP
 	int arena_index = g_iPlayerArena[client];
 	int client_slot = g_iPlayerSlot[client];
-	int client_foe_slot = (client_slot==SLOT_ONE || client_slot==SLOT_THREE) ? SLOT_TWO : SLOT_ONE;
+	int client_foe_slot = (client_slot == SLOT_ONE || client_slot == SLOT_THREE) ? SLOT_TWO : SLOT_ONE;
 	int client_foe = (g_iArenaQueue[g_iPlayerArena[client]][(g_iPlayerSlot[client] == SLOT_ONE || g_iPlayerSlot[client] == SLOT_THREE) ? SLOT_TWO : SLOT_ONE]); //test
 	int client_teammate;
 	int client_foe2;
@@ -1647,7 +1647,7 @@ void RemoveFromQueue(int client, bool calcstats=false, bool specfix=false) {
 		int player_team_slot;
 		
 		if (player_slot <= SLOT_FOUR && player_slot > 0) {
-			int foe_slot = (player_slot==SLOT_ONE || player_slot==SLOT_THREE) ? SLOT_TWO : SLOT_ONE;
+			int foe_slot = (player_slot == SLOT_ONE || player_slot == SLOT_THREE) ? SLOT_TWO : SLOT_ONE;
 			int foe = g_iArenaQueue[arena_index][foe_slot];
 			int player_teammate;
 			int foe2;
@@ -1741,8 +1741,8 @@ void RemoveFromQueue(int client, bool calcstats=false, bool specfix=false) {
 			}
 		}	
 	} else {
-		if (player_slot==SLOT_ONE || player_slot==SLOT_TWO) {
-			int foe_slot = player_slot==SLOT_ONE ? SLOT_TWO : SLOT_ONE;
+		if (player_slot == SLOT_ONE || player_slot == SLOT_TWO) {
+			int foe_slot = player_slot == SLOT_ONE ? SLOT_TWO : SLOT_ONE;
 			int foe = g_iArenaQueue[arena_index][foe_slot];
 
 			if (g_bArenaBBall[arena_index]) {
@@ -2618,7 +2618,7 @@ public int Menu_Top5(Handle menu, MenuAction action, int param1, int param2) {
 			//If the player selected back show the previous menu
 			if (param2 == 1) {
 				g_iELOMenuPage[param1]--;
-				if (g_iELOMenuPage[param1]==0) {
+				if (g_iELOMenuPage[param1] == 0) {
 					char query[256];
 					Format(query, sizeof(query), "SELECT rating, name FROM mgemod_stats ORDER BY rating DESC LIMIT 5");
 					//int data[] = {param1, param2-5, true};
@@ -2879,13 +2879,13 @@ public Action Command_JoinClass(int client, int args) {
 				}
 			}
 			
-			if (g_iPlayerSlot[client]==SLOT_ONE || g_iPlayerSlot[client]==SLOT_TWO || (g_bFourPersonArena[arena_index] && (g_iPlayerSlot[client] == SLOT_FOUR || g_iPlayerSlot[client] == SLOT_THREE))) {
+			if (g_iPlayerSlot[client] == SLOT_ONE || g_iPlayerSlot[client] == SLOT_TWO || (g_bFourPersonArena[arena_index] && (g_iPlayerSlot[client] == SLOT_FOUR || g_iPlayerSlot[client] == SLOT_THREE))) {
 				if (g_iArenaStatus[arena_index] != AS_FIGHT || g_bArenaMGE[arena_index] || g_bArenaEndif[arena_index] || g_bArenaKoth[arena_index]) {
 					TF2_SetPlayerClass(client, new_class);
 					g_tfctPlayerClass[client] = new_class;
 					if (IsPlayerAlive(client)) {
 						if ((g_iArenaStatus[arena_index] == AS_FIGHT && g_bArenaMGE[arena_index] || g_bArenaEndif[arena_index])) {
-							int killer_slot = (g_iPlayerSlot[client]==SLOT_ONE || g_iPlayerSlot[client]==SLOT_THREE) ? SLOT_TWO : SLOT_ONE;
+							int killer_slot = (g_iPlayerSlot[client] == SLOT_ONE || g_iPlayerSlot[client] == SLOT_THREE) ? SLOT_TWO : SLOT_ONE;
 							int fraglimit = g_iArenaFraglimit[arena_index];
 							int killer = g_iArenaQueue[arena_index][killer_slot];
 							int killer_teammate;
@@ -3009,7 +3009,7 @@ public Action Command_AddBot(int client, int args) { //adding bot to client's ar
 	int arena_index = g_iPlayerArena[client];
 	int player_slot = g_iPlayerSlot[client];
 
-	if (arena_index && (player_slot==SLOT_ONE || player_slot==SLOT_TWO || (g_bFourPersonArena[arena_index] && (player_slot==SLOT_THREE || player_slot==SLOT_FOUR)))) {
+	if (arena_index && (player_slot == SLOT_ONE || player_slot == SLOT_TWO || (g_bFourPersonArena[arena_index] && (player_slot == SLOT_THREE || player_slot == SLOT_FOUR)))) {
 		ServerCommand("tf_bot_add");
 		g_bPlayerAskedForBot[client] = true;
 	}
@@ -3225,7 +3225,7 @@ public Action Command_Handicap(int client, int args) {
 				
 				//Update overlay huds to reflect health change.
 				int player_slot = g_iPlayerSlot[client],
-					foe_slot = player_slot==SLOT_ONE ? SLOT_TWO : SLOT_ONE,
+					foe_slot = player_slot == SLOT_ONE ? SLOT_TWO : SLOT_ONE,
 					foe = g_iArenaQueue[arena_index][foe_slot],
 					foe_teammate,
 					player_teammate;
@@ -3614,7 +3614,7 @@ public Action Event_PlayerDeath(Handle event, const char[] name, bool dontBroadc
 	int arena_index = g_iPlayerArena[victim];
 	int victim_slot = g_iPlayerSlot[victim];
 	
-	int killer_slot = (victim_slot==SLOT_ONE || victim_slot==SLOT_THREE) ? SLOT_TWO : SLOT_ONE;
+	int killer_slot = (victim_slot == SLOT_ONE || victim_slot == SLOT_THREE) ? SLOT_TWO : SLOT_ONE;
 	int killer = g_iArenaQueue[arena_index][killer_slot];
 	int killer_teammate;
 	int victim_teammate;
@@ -4277,7 +4277,7 @@ public Action Timer_Tele(Handle timer, any userid) {
 	int besteffort_spawn;
 	for (int i = 0; i < g_iArenaSpawns[arena_index]; i++) {
 		int client_slot = g_iPlayerSlot[client];
-		int foe_slot = (client_slot==SLOT_ONE || client_slot==SLOT_THREE) ? SLOT_TWO : SLOT_ONE;
+		int foe_slot = (client_slot == SLOT_ONE || client_slot == SLOT_THREE) ? SLOT_TWO : SLOT_ONE;
 		if (foe_slot) {
 			float distance;
 			int foe = g_iArenaQueue[arena_index][foe_slot];
@@ -4970,7 +4970,7 @@ public void EndKoth(any arena_index, any winner_team) {
 	int fraglimit = g_iArenaFraglimit[arena_index];
 	int client = g_iArenaQueue[arena_index][winner_team];
 	int client_slot = winner_team;
-	int foe_slot = (client_slot==SLOT_ONE || client_slot==SLOT_THREE) ? SLOT_TWO : SLOT_ONE;
+	int foe_slot = (client_slot == SLOT_ONE || client_slot == SLOT_THREE) ? SLOT_TWO : SLOT_ONE;
 	int foe = g_iArenaQueue[arena_index][foe_slot];
 	int client_teammate;
 	int foe_teammate;
