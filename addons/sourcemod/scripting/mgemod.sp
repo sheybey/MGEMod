@@ -5,7 +5,9 @@
 #include <tf2_stocks>
 #include <entity_prop_stocks>
 #include <sdkhooks>
-#include <colors> 
+#include <colors>
+
+#pragma newdecls required // This must be after the includes.
 
 // ====[ CONSTANTS ]===================================================
 #define PL_VERSION "2.0.9.2" 
@@ -51,12 +53,12 @@ bool
 
 // HUD Handles
 Handle
-	hm_HP = INVALID_HANDLE,
-	hm_Score = INVALID_HANDLE,
-	hm_TeammateHP = INVALID_HANDLE,
-	hm_KothTimerBLU = INVALID_HANDLE,
-	hm_KothTimerRED = INVALID_HANDLE,
-	hm_KothCap = INVALID_HANDLE;
+	hm_HP = null,
+	hm_Score = null,
+	hm_TeammateHP = null,
+	hm_KothTimerBLU = null,
+	hm_KothTimerRED = null,
+	hm_KothCap = null;
 
 // Global Variables
 char
@@ -72,8 +74,8 @@ int
 
 // Database
 Handle
-	db = INVALID_HANDLE, // Connection to SQL database.
-	g_hDBReconnectTimer = INVALID_HANDLE;
+	db = null, // Connection to SQL database.
+	g_hDBReconnectTimer = null;
 char
 	g_sDBConfig[64];
 int
@@ -81,110 +83,110 @@ int
 
 // Global CVar Handles
 Handle
-	gcvar_WfP = INVALID_HANDLE,
-	gcvar_fragLimit = INVALID_HANDLE,
-	gcvar_allowedClasses = INVALID_HANDLE,
-	gcvar_blockFallDamage = INVALID_HANDLE,
-	gcvar_dbConfig = INVALID_HANDLE,
-	gcvar_midairHP = INVALID_HANDLE,
-	gcvar_airshotHeight = INVALID_HANDLE,
-	gcvar_RocketForceX = INVALID_HANDLE,
-	gcvar_RocketForceY = INVALID_HANDLE,
-	gcvar_RocketForceZ = INVALID_HANDLE,
-	gcvar_autoCvar = INVALID_HANDLE,
-	gcvar_bballParticle_red = INVALID_HANDLE,
-	gcvar_bballParticle_blue = INVALID_HANDLE,
-	gcvar_noDisplayRating = INVALID_HANDLE,
-	gcvar_stats = INVALID_HANDLE,
-	gcvar_reconnectInterval = INVALID_HANDLE,
-	gcvar_spawnFile = INVALID_HANDLE;
+	gcvar_WfP = null,
+	gcvar_fragLimit = null,
+	gcvar_allowedClasses = null,
+	gcvar_blockFallDamage = null,
+	gcvar_dbConfig = null,
+	gcvar_midairHP = null,
+	gcvar_airshotHeight = null,
+	gcvar_RocketForceX = null,
+	gcvar_RocketForceY = null,
+	gcvar_RocketForceZ = null,
+	gcvar_autoCvar = null,
+	gcvar_bballParticle_red = null,
+	gcvar_bballParticle_blue = null,
+	gcvar_noDisplayRating = null,
+	gcvar_stats = null,
+	gcvar_reconnectInterval = null,
+	gcvar_spawnFile = null;
 
 // Classes
 int g_tfctClassAllowed[TFClassType]; // Special "TFClass_Type" data type.
 
 // Arena Vars
 Handle
-	g_tKothTimer[MAXARENAS+1];
+	g_tKothTimer[MAXARENAS + 1];
 char
-	g_sArenaName[MAXARENAS+1][64];
+	g_sArenaName[MAXARENAS + 1][64];
 float
-	g_fArenaSpawnOrigin[MAXARENAS+1][MAXSPAWNS+1][3],
-	g_fArenaSpawnAngles[MAXARENAS+1][MAXSPAWNS+1][3],
-	g_fArenaHPRatio[MAXARENAS+1],
-	g_fArenaMinSpawnDist[MAXARENAS+1],
-	g_fArenaRespawnTime[MAXARENAS+1],
-	g_fCappedTime[MAXARENAS+1],
-	g_fKothCappedPercent[MAXARENAS+1];
+	g_fArenaSpawnOrigin[MAXARENAS + 1][MAXSPAWNS + 1][3],
+	g_fArenaSpawnAngles[MAXARENAS + 1][MAXSPAWNS + 1][3],
+	g_fArenaHPRatio[MAXARENAS + 1],
+	g_fArenaMinSpawnDist[MAXARENAS + 1],
+	g_fArenaRespawnTime[MAXARENAS + 1],
+	g_fCappedTime[MAXARENAS + 1],
+	g_fKothCappedPercent[MAXARENAS + 1];
 bool
-	g_bArenaAmmomod[MAXARENAS+1],
-	g_bArenaMidair[MAXARENAS+1],
-	g_bArenaMGE[MAXARENAS+1],
-	g_bArenaEndif[MAXARENAS+1],
-	g_bArenaBBall[MAXARENAS+1],
-	g_bVisibleHoops[MAXARENAS+1],
-	g_bArenaInfAmmo[MAXARENAS+1],
-	g_bFourPersonArena[MAXARENAS+1],
-	g_bArenaShowHPToPlayers[MAXARENAS+1],
-	g_bArenaUltiduo[MAXARENAS+1],
-	g_bArenaKoth[MAXARENAS+1],
-	g_bPlayerTouchPoint[MAXARENAS+1][5],
-	g_bArenaTurris[MAXARENAS+1],
-	g_bOvertimePlayed[MAXARENAS+1][4],
-	g_bTimerRunning[MAXARENAS+1];
+	g_bArenaAmmomod[MAXARENAS + 1],
+	g_bArenaMidair[MAXARENAS + 1],
+	g_bArenaMGE[MAXARENAS + 1],
+	g_bArenaEndif[MAXARENAS + 1],
+	g_bArenaBBall[MAXARENAS + 1],
+	g_bVisibleHoops[MAXARENAS + 1],
+	g_bArenaInfAmmo[MAXARENAS + 1],
+	g_bFourPersonArena[MAXARENAS + 1],
+	g_bArenaShowHPToPlayers[MAXARENAS + 1],
+	g_bArenaUltiduo[MAXARENAS + 1],
+	g_bArenaKoth[MAXARENAS + 1],
+	g_bPlayerTouchPoint[MAXARENAS + 1][5],
+	g_bArenaTurris[MAXARENAS + 1],
+	g_bOvertimePlayed[MAXARENAS + 1][4],
+	g_bTimerRunning[MAXARENAS + 1];
 int	
 	g_iArenaCount,
-	g_fTotalTime[MAXARENAS+1],
-	g_iCappingTeam[MAXARENAS+1],
-	g_iCapturePoint[MAXARENAS+1],
-	g_iDefaultCapTime[MAXARENAS+1],
-	g_iKothTimer[MAXARENAS+1][4],		// [what arena is the cap point in][Team Red or Team Blu Time left]
-	g_iPointState[MAXARENAS+1],	//1 = neutral, 2 = RED, 3 = BLU
-	g_iArenaScore[MAXARENAS+1][3],
-	g_iArenaQueue[MAXARENAS+1][MAXPLAYERS+1],
-	g_iArenaStatus[MAXARENAS+1],
-	g_iArenaCd[MAXARENAS+1], //countdown to round start
-	g_iArenaFraglimit[MAXARENAS+1],
-	g_iArenaMinRating[MAXARENAS+1],
-	g_iArenaMaxRating[MAXARENAS+1],
-	g_iArenaCdTime[MAXARENAS+1],
-	g_iArenaSpawns[MAXARENAS+1],
-	g_iBBallHoop[MAXARENAS+1][3], // [What arena the hoop is in][Hoop 1 or Hoop 2]
-	g_iBBallIntel[MAXARENAS+1],
-	g_iArenaEarlyLeave[MAXARENAS+1],
-	g_iELOMenuPage[MAXARENAS+1],
-	g_tfctArenaAllowedClasses[MAXARENAS+1][TFClassType]; // Special "TFClass_Type" data type.
+	g_fTotalTime[MAXARENAS + 1],
+	g_iCappingTeam[MAXARENAS + 1],
+	g_iCapturePoint[MAXARENAS + 1],
+	g_iDefaultCapTime[MAXARENAS + 1],
+	g_iKothTimer[MAXARENAS + 1][4],		// [what arena is the cap point in][Team Red or Team Blu Time left]
+	g_iPointState[MAXARENAS + 1],	//1 = neutral, 2 = RED, 3 = BLU
+	g_iArenaScore[MAXARENAS + 1][3],
+	g_iArenaQueue[MAXARENAS + 1][MAXPLAYERS + 1],
+	g_iArenaStatus[MAXARENAS + 1],
+	g_iArenaCd[MAXARENAS + 1], //countdown to round start
+	g_iArenaFraglimit[MAXARENAS + 1],
+	g_iArenaMinRating[MAXARENAS + 1],
+	g_iArenaMaxRating[MAXARENAS + 1],
+	g_iArenaCdTime[MAXARENAS + 1],
+	g_iArenaSpawns[MAXARENAS + 1],
+	g_iBBallHoop[MAXARENAS + 1][3], // [What arena the hoop is in][Hoop 1 or Hoop 2]
+	g_iBBallIntel[MAXARENAS + 1],
+	g_iArenaEarlyLeave[MAXARENAS + 1],
+	g_iELOMenuPage[MAXARENAS + 1],
+	g_tfctArenaAllowedClasses[MAXARENAS + 1][TFClassType]; // Special "TFClass_Type" data type.
 
 // Player vars
 Handle
-	g_hWelcomeTimer[MAXPLAYERS+1];
+	g_hWelcomeTimer[MAXPLAYERS + 1];
 char
-	g_sPlayerSteamID[MAXPLAYERS+1][32];//saving steamid
+	g_sPlayerSteamID[MAXPLAYERS + 1][32];//saving steamid
 bool
-	g_bPlayerTakenDirectHit[MAXPLAYERS+1], //player was hit directly
-	g_bPlayerRestoringAmmo[MAXPLAYERS+1], //player is awaiting full ammo restore
-	g_bPlayerHasIntel[MAXPLAYERS+1],
-	g_bHitBlip[MAXPLAYERS+1],
-	g_bShowHud[MAXPLAYERS+1] = true,
-	g_iPlayerWaiting[MAXPLAYERS+1],
-	g_bCanPlayerSwap[MAXPLAYERS+1],
-	g_bCanPlayerGetIntel[MAXPLAYERS+1];
+	g_bPlayerTakenDirectHit[MAXPLAYERS + 1], //player was hit directly
+	g_bPlayerRestoringAmmo[MAXPLAYERS + 1], //player is awaiting full ammo restore
+	g_bPlayerHasIntel[MAXPLAYERS + 1],
+	g_bHitBlip[MAXPLAYERS + 1],
+	g_bShowHud[MAXPLAYERS + 1] = true,
+	g_iPlayerWaiting[MAXPLAYERS + 1],
+	g_bCanPlayerSwap[MAXPLAYERS + 1],
+	g_bCanPlayerGetIntel[MAXPLAYERS + 1];
 int
-	g_iPlayerArena[MAXPLAYERS+1],
-	g_iPlayerSlot[MAXPLAYERS+1],
-	g_iPlayerHP[MAXPLAYERS+1], //true HP of players
-	g_iPlayerSpecTarget[MAXPLAYERS+1],
-	g_iPlayerMaxHP[MAXPLAYERS+1],
-	g_iClientParticle[MAXPLAYERS+1],
-	g_iPlayerClip[MAXPLAYERS+1][3],
-	g_iPlayerWins[MAXPLAYERS+1],
-	g_iPlayerLosses[MAXPLAYERS+1],
-	g_iPlayerRating[MAXPLAYERS+1],
-	g_iPlayerHandicap[MAXPLAYERS+1];
+	g_iPlayerArena[MAXPLAYERS + 1],
+	g_iPlayerSlot[MAXPLAYERS + 1],
+	g_iPlayerHP[MAXPLAYERS + 1], //true HP of players
+	g_iPlayerSpecTarget[MAXPLAYERS + 1],
+	g_iPlayerMaxHP[MAXPLAYERS + 1],
+	g_iClientParticle[MAXPLAYERS + 1],
+	g_iPlayerClip[MAXPLAYERS + 1][3],
+	g_iPlayerWins[MAXPLAYERS + 1],
+	g_iPlayerLosses[MAXPLAYERS + 1],
+	g_iPlayerRating[MAXPLAYERS + 1],
+	g_iPlayerHandicap[MAXPLAYERS + 1];
 TFClassType
-	g_tfctPlayerClass[MAXPLAYERS+1];
+	g_tfctPlayerClass[MAXPLAYERS + 1];
 
 // Bot things
-bool g_bPlayerAskedForBot[MAXPLAYERS+1];
+bool g_bPlayerAskedForBot[MAXPLAYERS + 1];
 
 // Midair
 int g_iMidairHP;
@@ -465,7 +467,7 @@ public void OnMapStart() {
  * Hooks are removed here.
  * -------------------------------------------------------------------------- */
 public void OnMapEnd() {
-	g_hDBReconnectTimer = INVALID_HANDLE;
+	g_hDBReconnectTimer = null;
 	g_bNoStats = (GetConVarBool(gcvar_stats)) ? false : true;
 
 	UnhookEvent("player_death", Event_PlayerDeath, EventHookMode_Pre);
@@ -659,9 +661,9 @@ public void OnClientDisconnect(int client) {
 		}
 	}
 
-	if (g_hWelcomeTimer[client] != INVALID_HANDLE) {
+	if (g_hWelcomeTimer[client] != null) {
 		KillTimer(g_hWelcomeTimer[client]);
-		g_hWelcomeTimer[client] = INVALID_HANDLE;
+		g_hWelcomeTimer[client] = null;
 	}
 }
 
@@ -1008,7 +1010,7 @@ public Action OnTouchHoop(int entity, int other) {
 		g_bPlayerHasIntel[client] = false;
 		g_iArenaScore[arena_index][client_team_slot] += 1;
 
-		if (fraglimit>0 && g_iArenaScore[arena_index][client_team_slot] >= fraglimit && g_iArenaStatus[arena_index] >= AS_FIGHT && g_iArenaStatus[arena_index] < AS_REPORTED) {
+		if (fraglimit > 0 && g_iArenaScore[arena_index][client_team_slot] >= fraglimit && g_iArenaStatus[arena_index] >= AS_FIGHT && g_iArenaStatus[arena_index] < AS_REPORTED) {
 			g_iArenaStatus[arena_index] = AS_REPORTED;
 			GetClientName(client, client_name, sizeof(client_name));
 			
@@ -1195,25 +1197,25 @@ int StartCountDown(int arena_index) {
 				int ent = GetPlayerWeaponSlot(red_f1, i);
 	
 				if (IsValidEntity(ent)) {
-					SetEntPropFloat(ent, Prop_Send, "m_flNextPrimaryAttack", enginetime+1.1);
+					SetEntPropFloat(ent, Prop_Send, "m_flNextPrimaryAttack", enginetime + 1.1);
 				}
 
 				ent = GetPlayerWeaponSlot(blu_f1, i);
 
 				if (IsValidEntity(ent)) {
-					SetEntPropFloat(ent, Prop_Send, "m_flNextPrimaryAttack", enginetime+1.1);
+					SetEntPropFloat(ent, Prop_Send, "m_flNextPrimaryAttack", enginetime + 1.1);
 				}
 					
 				ent = GetPlayerWeaponSlot(red_f2, i);
 	
 				if (IsValidEntity(ent)) {
-					SetEntPropFloat(ent, Prop_Send, "m_flNextPrimaryAttack", enginetime+1.1);
+					SetEntPropFloat(ent, Prop_Send, "m_flNextPrimaryAttack", enginetime + 1.1);
 				}
 
 				ent = GetPlayerWeaponSlot(blu_f2, i);
 
 				if (IsValidEntity(ent)) {
-					SetEntPropFloat(ent, Prop_Send, "m_flNextPrimaryAttack", enginetime+1.1);
+					SetEntPropFloat(ent, Prop_Send, "m_flNextPrimaryAttack", enginetime + 1.1);
 				}
 			}
 			
@@ -1241,13 +1243,13 @@ int StartCountDown(int arena_index) {
 				int ent = GetPlayerWeaponSlot(red_f1, i);
 
 				if (IsValidEntity(ent)) {
-					SetEntPropFloat(ent, Prop_Send, "m_flNextPrimaryAttack", enginetime+1.1);
+					SetEntPropFloat(ent, Prop_Send, "m_flNextPrimaryAttack", enginetime + 1.1);
 				}
 
 				ent = GetPlayerWeaponSlot(blu_f1, i);
 
 				if (IsValidEntity(ent)) {
-					SetEntPropFloat(ent, Prop_Send, "m_flNextPrimaryAttack", enginetime+1.1);
+					SetEntPropFloat(ent, Prop_Send, "m_flNextPrimaryAttack", enginetime + 1.1);
 				}
 			}
 
@@ -1296,7 +1298,7 @@ void ShowPlayerHud(int client) {
 	int arena_index = g_iPlayerArena[client];
 	int client_slot = g_iPlayerSlot[client];
 	int client_foe_slot = (client_slot==SLOT_ONE || client_slot==SLOT_THREE) ? SLOT_TWO : SLOT_ONE;
-	int client_foe = (g_iArenaQueue[g_iPlayerArena[client]][(g_iPlayerSlot[client]==SLOT_ONE || g_iPlayerSlot[client]==SLOT_THREE) ? SLOT_TWO : SLOT_ONE]); //test
+	int client_foe = (g_iArenaQueue[g_iPlayerArena[client]][(g_iPlayerSlot[client] == SLOT_ONE || g_iPlayerSlot[client] == SLOT_THREE) ? SLOT_TWO : SLOT_ONE]); //test
 	int client_teammate;
 	int client_foe2;
 	char hp_report[128];
@@ -1307,9 +1309,8 @@ void ShowPlayerHud(int client) {
 	}
 	
 	if (g_bArenaKoth[arena_index]) {
-		if (g_iArenaStatus[arena_index] == AS_FIGHT || true)
-			{
-				//Show the red team timer, if they have it capped make the timer red
+		if (g_iArenaStatus[arena_index] == AS_FIGHT || true) {
+			//Show the red team timer, if they have it capped make the timer red
 			if (g_iPointState[arena_index] == TEAM_RED) {
 				SetHudTextParams(0.40, 0.01, HUDFADEOUTTIME, 255, 0, 0, 255); // Red
 			} else {
@@ -1612,7 +1613,7 @@ void HideHud(int client) {
 }
 
 // ====[ QUEUE ]==================================================== 
-void RemoveFromQueue(client, bool calcstats=false, bool specfix=false) {
+void RemoveFromQueue(int client, bool calcstats=false, bool specfix=false) {
 	int arena_index = g_iPlayerArena[client];
 
 	if (arena_index == 0) {
@@ -1711,9 +1712,9 @@ void RemoveFromQueue(client, bool calcstats=false, bool specfix=false) {
 				}
 			}
 
-			if (g_iArenaQueue[arena_index][SLOT_FOUR+1]) {
-				int next_client = g_iArenaQueue[arena_index][SLOT_FOUR+1];
-				g_iArenaQueue[arena_index][SLOT_FOUR+1] = 0;
+			if (g_iArenaQueue[arena_index][SLOT_FOUR + 1]) {
+				int next_client = g_iArenaQueue[arena_index][SLOT_FOUR + 1];
+				g_iArenaQueue[arena_index][SLOT_FOUR + 1] = 0;
 				g_iArenaQueue[arena_index][player_slot] = next_client;
 				g_iPlayerSlot[next_client] = player_slot;
 				after_leaver_slot = SLOT_FOUR + 2;
@@ -1776,9 +1777,9 @@ void RemoveFromQueue(client, bool calcstats=false, bool specfix=false) {
 				}
 			}
 
-			if (g_iArenaQueue[arena_index][SLOT_TWO+1]) {
-				int next_client = g_iArenaQueue[arena_index][SLOT_TWO+1];
-				g_iArenaQueue[arena_index][SLOT_TWO+1] = 0;
+			if (g_iArenaQueue[arena_index][SLOT_TWO + 1]) {
+				int next_client = g_iArenaQueue[arena_index][SLOT_TWO + 1];
+				g_iArenaQueue[arena_index][SLOT_TWO + 1] = 0;
 				g_iArenaQueue[arena_index][player_slot] = next_client;
 				g_iPlayerSlot[next_client] = player_slot;
 				after_leaver_slot = SLOT_TWO + 2;
@@ -2086,7 +2087,7 @@ bool LoadSpawnPoints() {
 								do {
 									g_iArenaSpawns[g_iArenaCount]++;
 									IntToString(g_iArenaSpawns[g_iArenaCount], intstr, sizeof(intstr));
-									IntToString(g_iArenaSpawns[g_iArenaCount]+1, intstr2, sizeof(intstr2));
+									IntToString(g_iArenaSpawns[g_iArenaCount] + 1, intstr2, sizeof(intstr2));
 									KvGetString(kv, intstr, spawn, sizeof(spawn));
 									count = ExplodeString(spawn, " ", spawnCo, 6, 16);
 									if (count == 6) {
@@ -2094,7 +2095,7 @@ bool LoadSpawnPoints() {
 											g_fArenaSpawnOrigin[g_iArenaCount][g_iArenaSpawns[g_iArenaCount]][i] = StringToFloat(spawnCo[i]);
 										}
 										for (i = 3; i < 6; i++) {
-											g_fArenaSpawnAngles[g_iArenaCount][g_iArenaSpawns[g_iArenaCount]][i-3] = StringToFloat(spawnCo[i]);
+											g_fArenaSpawnAngles[g_iArenaCount][g_iArenaSpawns[g_iArenaCount]][i - 3] = StringToFloat(spawnCo[i]);
 										}
 									} else if (count == 4) {
 										for (i = 0; i < 3; i++) {
@@ -2932,7 +2933,7 @@ public Action Command_JoinClass(int client, int args) {
 								}
 							}
 
-							if (g_iArenaStatus[arena_index] == AS_FIGHT && fraglimit>0 && g_iArenaScore[arena_index][killer_team_slot] >= fraglimit) {
+							if (g_iArenaStatus[arena_index] == AS_FIGHT && fraglimit > 0 && g_iArenaScore[arena_index][killer_team_slot] >= fraglimit) {
 								char killer_name[(MAX_NAME_LENGTH * 2) + 5];
 								char victim_name[(MAX_NAME_LENGTH * 2) + 5];
 								GetClientName(killer, killer_name, sizeof(killer_name));
@@ -3251,7 +3252,7 @@ public Action Command_Handicap(int client, int args) {
 *
 * When a player drops the intel in BBall.
 * -------------------------------------------------------------------------- */
-public Action Command_DropItem(int client, const char[] command, argc) {
+public Action Command_DropItem(int client, const char[] command, int argc) {
 	int arena_index = g_iPlayerArena[client];
 	
 	if (g_bArenaBBall[arena_index]) {
@@ -3315,11 +3316,11 @@ void PrepareSQL() { // Opens the connection to the database, and creates the tab
 		db = SQL_Connect(g_sDBConfig, true, error, sizeof(error));
 	}
 
-	if (db == INVALID_HANDLE) {
+	if (db == null) {
 		LogError("Cant use database config <%s> <Error: %s>, trying SQLite <storage-local>...", g_sDBConfig, error);
 		db = SQL_Connect("storage-local", true, error, sizeof(error));
 
-		if (db == INVALID_HANDLE) {
+		if (db == null) {
 			SetFailState("Could not connect to database: %s", error);
 		}
 		else {
@@ -3353,7 +3354,7 @@ void PrepareSQL() { // Opens the connection to the database, and creates the tab
 public void T_SQLQueryOnConnect(Handle owner, Handle hndl, const char[] error, any data) {
 	int client = data;
 
-	if (hndl == INVALID_HANDLE) {
+	if (hndl == null) {
 		LogError("T_SQLQueryOnConnect failed: %s", error);
 		return;
 	} 
@@ -3393,7 +3394,7 @@ public void T_SQLQueryOnConnect(Handle owner, Handle hndl, const char[] error, a
 public void T_SQL_Top5(Handle owner, Handle hndl, const char[] error, any data) {
 	int client = data;
 	
-	if (hndl == INVALID_HANDLE) {
+	if (hndl == null) {
 		LogError("[Top5] Query failed: %s", error);
 		return;
 	} 
@@ -3429,7 +3430,7 @@ public void T_SQL_Top5(Handle owner, Handle hndl, const char[] error, any data) 
 public void T_SQL_Test(Handle owner, Handle hndl, const char[] error, any data) {
 	int client = data;
 
-	if (hndl == INVALID_HANDLE) {
+	if (hndl == null) {
 		LogError("[Test] Query failed: %s", error);
 		PrintToChat(client, "[Test] Query failed: %s", error);
 		return;
@@ -3460,7 +3461,7 @@ public void SQLErrorCheckCallback(Handle owner, Handle hndl, const char[] error,
 
 			LogError("Lost connection to database, attempting reconnect in %i minutes.", g_iReconnectInterval);
 
-			if (g_hDBReconnectTimer == INVALID_HANDLE) {
+			if (g_hDBReconnectTimer == null) {
 				g_hDBReconnectTimer = CreateTimer(float(60 * g_iReconnectInterval), Timer_ReconnectToDB, TIMER_FLAG_NO_MAPCHANGE);
 			}
 		}
@@ -3474,7 +3475,7 @@ public void SQLDbConnTest(Handle owner, Handle hndl, const char[] error, any dat
 		LogError("Database reconnect failed, next attempt in %i minutes.", g_iReconnectInterval);
 		PrintHintTextToAll("%t", "DatabaseDown", g_iReconnectInterval);
 
-		if (g_hDBReconnectTimer == INVALID_HANDLE) {
+		if (g_hDBReconnectTimer == null) {
 			g_hDBReconnectTimer = CreateTimer(float(60 * g_iReconnectInterval), Timer_ReconnectToDB, TIMER_FLAG_NO_MAPCHANGE);
 		}
 	} else {
@@ -3545,7 +3546,7 @@ public void Event_WinPanel(Handle event, const char[] name, bool dontBroadcast) 
 	g_bNoStats = true;
 }
 
-public Action Event_PlayerHurt(Handle event, const char[] name, booldontBroadcast) {
+public Action Event_PlayerHurt(Handle event, const char[] name, bool dontBroadcast) {
 	int victim = GetClientOfUserId(GetEventInt(event, "userid"));
 
 	if (!IsValidClient(victim)) {
@@ -4006,7 +4007,7 @@ public Action Timer_WelcomePlayer(Handle timer, any userid) {
 		CPrintToChat(client, "%t", "Welcome2");
 	}
 	CPrintToChat(client, "%t", "Welcome3");
-	g_hWelcomeTimer[client] = INVALID_HANDLE;
+	g_hWelcomeTimer[client] = null;
 }
 
 public Action Timer_SpecFix(Handle timer, any userid) {
@@ -4037,7 +4038,7 @@ public Action Timer_AllowPlayerCap(Handle timer, any userid) {
 	g_bCanPlayerGetIntel[userid] = true;
 }
 
-public Action:Timer_CountDown(Handle timer, any arena_index) {
+public Action Timer_CountDown(Handle timer, any arena_index) {
 	int red_f1 = g_iArenaQueue[arena_index][SLOT_ONE];
 	int blu_f1 = g_iArenaQueue[arena_index][SLOT_TWO];
 	int red_f2;
@@ -4050,7 +4051,7 @@ public Action:Timer_CountDown(Handle timer, any arena_index) {
 		if (red_f1 && blu_f1 && red_f2 && blu_f2) {
 			g_iArenaCd[arena_index]--;
 
-			if (g_iArenaCd[arena_index]>0) { // blocking +attack
+			if (g_iArenaCd[arena_index] > 0) { // blocking +attack
 				float enginetime = GetGameTime();
 
 				for (int i = 0; i <= 2; i++) {
@@ -4452,7 +4453,7 @@ public Action Timer_ResetSwap(Handle timer, any client) {
 }
 
 public Action Timer_ReconnectToDB(Handle timer) {
-	g_hDBReconnectTimer = INVALID_HANDLE;
+	g_hDBReconnectTimer = null;
 
 	char query[256];
 	Format(query, sizeof(query), "SELECT rating FROM mgemod_stats LIMIT 1");
@@ -4806,7 +4807,7 @@ bool IsValidClient(int iClient) {
  *
  * Does this player's gun shoot rockets or pipes? 
  * -------------------------------------------------------------------------- */
-bool ShootsRocketsOrPipes(client) {
+bool ShootsRocketsOrPipes(int client) {
 	char weapon[64];
 	GetClientWeapon(client, weapon, sizeof(weapon));
 	return (StrContains(weapon, "tf_weapon_rocketlauncher") == 0)|| StrEqual(weapon, "tf_weapon_grenadelauncher");
@@ -4816,7 +4817,7 @@ bool ShootsRocketsOrPipes(client) {
  *
  * How high off the ground is the player?
  * -------------------------------------------------------------------------- */
-float DistanceAboveGround(victim) {
+float DistanceAboveGround(int victim) {
 	float vStart[3];
 	float vEnd[3];
 	float vAngles[3] = {90.0, 0.0, 0.0};
@@ -4840,7 +4841,7 @@ float DistanceAboveGround(victim) {
  * How high off the ground is the player?
  * This is used for dropping
  * -------------------------------------------------------------------------- */
-float DistanceAboveGroundAroundPlayer(victim) {
+float DistanceAboveGroundAroundPlayer(int victim) {
 	float vStart[3];
 	float vEnd[3];
 	float vAngles[3] = {90.0, 0.0, 0.0};
@@ -4933,7 +4934,7 @@ stock int FindEntityByClassname2(int startEnt, const char[] classname) {
  * Gets a clients teammate if he's in a 4 player arena
  * This can actually be replaced by g_iArenaQueue[SLOT_X] but I didn't realize that array existed, so YOLO
  *---------------------------------------------------------------------*/
- public int getTeammate(myClient, myClientSlot, arena_index) {
+ public int getTeammate(int myClient, int myClientSlot, int arena_index) {
 	
 	int client_teammate_slot;
 	
@@ -4955,7 +4956,7 @@ stock int FindEntityByClassname2(int startEnt, const char[] classname) {
  * 
  * Gets if a client is waiting
  *---------------------------------------------------------------------*/
-bool isPlayerWaiting(myClient) {
+bool isPlayerWaiting(int myClient) {
 	return g_iPlayerWaiting[myClient];
 }
 
@@ -4963,7 +4964,7 @@ bool isPlayerWaiting(myClient) {
 *
 * Called when someone wins an ultiduo round
 * --------------------------------------------------------------------------- */
-public void EndKoth(any:arena_index, any:winner_team) {
+public void EndKoth(any arena_index, any winner_team) {
 	PlayEndgameSoundsToArena(arena_index, winner_team);
 	g_iArenaScore[arena_index][winner_team] += 1;
 	int fraglimit = g_iArenaFraglimit[arena_index];
@@ -4986,7 +4987,7 @@ public void EndKoth(any:arena_index, any:winner_team) {
 		foe_teammate = getTeammate(foe, foe_slot, arena_index);
 	}
 	
-	if (fraglimit>0 && g_iArenaScore[arena_index][winner_team] >= fraglimit && g_iArenaStatus[arena_index] >= AS_FIGHT && g_iArenaStatus[arena_index] < AS_REPORTED) {
+	if (fraglimit > 0 && g_iArenaScore[arena_index][winner_team] >= fraglimit && g_iArenaStatus[arena_index] >= AS_FIGHT && g_iArenaStatus[arena_index] < AS_REPORTED) {
 		g_iArenaStatus[arena_index] = AS_REPORTED;
 		char foe_name[MAX_NAME_LENGTH];
 		GetClientName(foe, foe_name, sizeof(foe_name));
