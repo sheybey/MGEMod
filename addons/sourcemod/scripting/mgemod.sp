@@ -581,9 +581,9 @@ public void OnClientDisconnect(int client) {
 		g_iPlayerHandicap[client] = 0;
 		
 		if (g_bFourPersonArena[arena_index]) {
-			if (g_iArenaQueue[arena_index][SLOT_FOUR+1]) {
-				int next_client = g_iArenaQueue[arena_index][SLOT_FOUR+1];
-				g_iArenaQueue[arena_index][SLOT_FOUR+1] = 0;
+			if (g_iArenaQueue[arena_index][SLOT_FOUR + 1]) {
+				int next_client = g_iArenaQueue[arena_index][SLOT_FOUR + 1];
+				g_iArenaQueue[arena_index][SLOT_FOUR + 1] = 0;
 				g_iArenaQueue[arena_index][player_slot] = next_client;
 				g_iPlayerSlot[next_client] = player_slot;
 				after_leaver_slot = SLOT_FOUR + 2;
@@ -621,9 +621,9 @@ public void OnClientDisconnect(int client) {
 				return;
 			}
 		} else {
-			if (g_iArenaQueue[arena_index][SLOT_TWO+1]) {
-				int next_client = g_iArenaQueue[arena_index][SLOT_TWO+1];
-				g_iArenaQueue[arena_index][SLOT_TWO+1] = 0;
+			if (g_iArenaQueue[arena_index][SLOT_TWO + 1]) {
+				int next_client = g_iArenaQueue[arena_index][SLOT_TWO + 1];
+				g_iArenaQueue[arena_index][SLOT_TWO + 1] = 0;
 				g_iArenaQueue[arena_index][player_slot] = next_client;
 				g_iPlayerSlot[next_client] = player_slot;
 				after_leaver_slot = SLOT_TWO + 2;
@@ -653,11 +653,11 @@ public void OnClientDisconnect(int client) {
 
 		if (g_iArenaQueue[arena_index][after_leaver_slot]) {
 			while (g_iArenaQueue[arena_index][after_leaver_slot]) {
-				g_iArenaQueue[arena_index][after_leaver_slot-1] = g_iArenaQueue[arena_index][after_leaver_slot];
+				g_iArenaQueue[arena_index][after_leaver_slot - 1] = g_iArenaQueue[arena_index][after_leaver_slot];
 				g_iPlayerSlot[g_iArenaQueue[arena_index][after_leaver_slot]] -= 1;
 				after_leaver_slot++;
 			}
-			g_iArenaQueue[arena_index][after_leaver_slot-1] = 0;
+			g_iArenaQueue[arena_index][after_leaver_slot - 1] = 0;
 		}
 	}
 
@@ -1044,7 +1044,7 @@ public Action OnTouchHoop(int entity, int other) {
 				RemoveFromQueue(foe_teammate, false);
 				AddInQueue(foe, arena_index, false);
 				AddInQueue(foe_teammate, arena_index, false);
-			} else if (g_iArenaQueue[arena_index][SLOT_TWO+1]) {
+			} else if (g_iArenaQueue[arena_index][SLOT_TWO + 1]) {
 				RemoveFromQueue(foe, false);
 				AddInQueue(foe, arena_index, false);
 			} else {
@@ -1808,11 +1808,11 @@ void RemoveFromQueue(int client, bool calcstats=false, bool specfix=false) {
 	}
 	if (g_iArenaQueue[arena_index][after_leaver_slot]) {
 		while (g_iArenaQueue[arena_index][after_leaver_slot]){
-			g_iArenaQueue[arena_index][after_leaver_slot-1] = g_iArenaQueue[arena_index][after_leaver_slot];
+			g_iArenaQueue[arena_index][after_leaver_slot - 1] = g_iArenaQueue[arena_index][after_leaver_slot];
 			g_iPlayerSlot[g_iArenaQueue[arena_index][after_leaver_slot]] -= 1;
 			after_leaver_slot++;
 		}
-		g_iArenaQueue[arena_index][after_leaver_slot-1] = 0;
+		g_iArenaQueue[arena_index][after_leaver_slot - 1] = 0;
 	}
 }
 
@@ -1911,7 +1911,7 @@ void AddInQueue(int client, int arena_index, bool showmsg = true, int playerPref
 			if (player_slot == SLOT_TWO + 1) {
 				CPrintToChat(client, "%t", "NextInLine");
 			} else {
-				CPrintToChat(client, "%t", "InLine", player_slot-SLOT_TWO);
+				CPrintToChat(client, "%t", "InLine", player_slot - SLOT_TWO);
 			}
 		}
 	}
@@ -2204,11 +2204,11 @@ int ResetPlayer(int client) {
 	if (g_bArenaMidair[arena_index]) {
 		g_iPlayerHP[client] = g_iMidairHP;
 	} else {
-		g_iPlayerHP[client] = g_iPlayerHandicap[client] ? g_iPlayerHandicap[client] : RoundToNearest(float(g_iPlayerMaxHP[client])*g_fArenaHPRatio[arena_index]);
+		g_iPlayerHP[client] = g_iPlayerHandicap[client] ? g_iPlayerHandicap[client] : RoundToNearest(float(g_iPlayerMaxHP[client]) * g_fArenaHPRatio[arena_index]);
 	}
 
 	if (g_bArenaMGE[arena_index] || g_bArenaBBall[arena_index]) {
-		SetEntProp(client, Prop_Data, "m_iHealth", g_iPlayerHandicap[client] ? g_iPlayerHandicap[client] : RoundToNearest(float(g_iPlayerMaxHP[client])*g_fArenaHPRatio[arena_index]));
+		SetEntProp(client, Prop_Data, "m_iHealth", g_iPlayerHandicap[client] ? g_iPlayerHandicap[client] : RoundToNearest(float(g_iPlayerMaxHP[client]) * g_fArenaHPRatio[arena_index]));
 	}
 
 	ShowPlayerHud(client);
@@ -2402,7 +2402,7 @@ void ShowMainMenu(int client, bool listplayers=true) {
 	SetMenuTitle(menu, title);
 	char si[4];
 
-	for (int i=1; i <= g_iArenaCount; i++) {
+	for (int i = 1; i <= g_iArenaCount; i++) {
 		int numslots = 0;
 		for (int j = 1; j <= MAXPLAYERS + 1; j++) {
 			if (g_iArenaQueue[i][j]) {
@@ -2910,7 +2910,7 @@ public Action Command_JoinClass(int client, int args) {
 
 							if (IsValidClient(killer)) {
 								TF2_RegeneratePlayer(killer);
-								int raised_hp = RoundToNearest(float(g_iPlayerMaxHP[killer])*g_fArenaHPRatio[arena_index]);
+								int raised_hp = RoundToNearest(float(g_iPlayerMaxHP[killer]) * g_fArenaHPRatio[arena_index]);
 								g_iPlayerHP[killer] = raised_hp;
 								SetEntProp(killer, Prop_Data, "m_iHealth", raised_hp);
 								ShowPlayerHud(killer);
@@ -2919,14 +2919,14 @@ public Action Command_JoinClass(int client, int args) {
 							if (g_bFourPersonArena[arena_index]) {
 								if (IsValidClient(killer_teammate)) {
 									TF2_RegeneratePlayer(killer_teammate);
-									int raised_hp = RoundToNearest(float(g_iPlayerMaxHP[killer_teammate])*g_fArenaHPRatio[arena_index]);
+									int raised_hp = RoundToNearest(float(g_iPlayerMaxHP[killer_teammate]) * g_fArenaHPRatio[arena_index]);
 									g_iPlayerHP[killer_teammate] = raised_hp;
 									SetEntProp(killer_teammate, Prop_Data, "m_iHealth", raised_hp);
 									ShowPlayerHud(killer_teammate);
 								}
 								if (IsValidClient(client_teammate)) {
 									TF2_RegeneratePlayer(client_teammate);
-									int raised_hp = RoundToNearest(float(g_iPlayerMaxHP[client_teammate])*g_fArenaHPRatio[arena_index]);
+									int raised_hp = RoundToNearest(float(g_iPlayerMaxHP[client_teammate]) * g_fArenaHPRatio[arena_index]);
 									g_iPlayerHP[client_teammate] = raised_hp;
 									SetEntProp(client_teammate, Prop_Data, "m_iHealth", raised_hp);
 									ShowPlayerHud(client_teammate);
@@ -3101,11 +3101,11 @@ public Action Command_Rank(int client, int args) {
 			} else {
 				CPrintToChat(client, "%t", "MyRank", g_iPlayerRating[client], g_iPlayerWins[client], g_iPlayerLosses[client]);
 			}
-		} else if (targ!=-1) {
+		} else if (targ != -1) {
 			if (g_bNoDisplayRating) {
-				PrintToChat(client, "\x03%N\x01 has \x04%i\x01 wins and \x04%i\x01 losses. You have a \x04%i%%\x01 chance of beating him.", targ, g_iPlayerWins[targ], g_iPlayerLosses[targ], RoundFloat((1/(Pow(10.0, float((g_iPlayerRating[targ]-g_iPlayerRating[client]))/400)+1))*100));
+				PrintToChat(client, "\x03%N\x01 has \x04%i\x01 wins and \x04%i\x01 losses. You have a \x04%i%%\x01 chance of beating him.", targ, g_iPlayerWins[targ], g_iPlayerLosses[targ], RoundFloat((1 / (Pow(10.0, float((g_iPlayerRating[targ] - g_iPlayerRating[client])) / 400) + 1)) * 100));
 			} else {
-				PrintToChat(client, "\x03%N\x01's rating is \x04%i\x01. You have a \x04%i%%\x01 chance of beating him.", targ, g_iPlayerRating[targ], RoundFloat((1/(Pow(10.0, float((g_iPlayerRating[targ]-g_iPlayerRating[client]))/400)+1))*100));
+				PrintToChat(client, "\x03%N\x01's rating is \x04%i\x01. You have a \x04%i%%\x01 chance of beating him.", targ, g_iPlayerRating[targ], RoundFloat((1 / (Pow(10.0, float((g_iPlayerRating[targ] - g_iPlayerRating[client])) / 400) + 1)) * 100));
 			}
 		}
 	}
@@ -3783,7 +3783,7 @@ public Action Event_PlayerDeath(Handle event, const char[] name, bool dontBroadc
 		} else {
 			if (!g_bFourPersonArena[arena_index] && !g_bArenaKoth[arena_index]) {
 				TF2_RegeneratePlayer(killer);
-				int raised_hp = RoundToNearest(float(g_iPlayerMaxHP[killer])*g_fArenaHPRatio[arena_index]);
+				int raised_hp = RoundToNearest(float(g_iPlayerMaxHP[killer]) * g_fArenaHPRatio[arena_index]);
 				g_iPlayerHP[killer] = raised_hp;
 				SetEntProp(killer, Prop_Data, "m_iHealth", raised_hp);
 			}
@@ -4718,14 +4718,14 @@ public Action Timer_RegenArena(Handle timer, any arena_index) {
 	
 	if (IsPlayerAlive(client)) {
 		TF2_RegeneratePlayer(client);
-		int raised_hp = RoundToNearest(float(g_iPlayerMaxHP[client])*g_fArenaHPRatio[arena_index]);
+		int raised_hp = RoundToNearest(float(g_iPlayerMaxHP[client]) * g_fArenaHPRatio[arena_index]);
 		g_iPlayerHP[client] = raised_hp;
 		SetEntProp(client, Prop_Data, "m_iHealth", raised_hp);
 	}
 	
 	if (IsPlayerAlive(client2)) {
 		TF2_RegeneratePlayer(client2);
-		int raised_hp2 = RoundToNearest(float(g_iPlayerMaxHP[client2])*g_fArenaHPRatio[arena_index]);
+		int raised_hp2 = RoundToNearest(float(g_iPlayerMaxHP[client2]) * g_fArenaHPRatio[arena_index]);
 		g_iPlayerHP[client2] = raised_hp2;
 		SetEntProp(client2, Prop_Data, "m_iHealth", raised_hp2);
 	}
@@ -4735,13 +4735,13 @@ public Action Timer_RegenArena(Handle timer, any arena_index) {
 		int client4 = g_iArenaQueue[arena_index][SLOT_FOUR];
 		if (IsPlayerAlive(client3)) {
 			TF2_RegeneratePlayer(client3);
-			int raised_hp3 = RoundToNearest(float(g_iPlayerMaxHP[client3])*g_fArenaHPRatio[arena_index]);
+			int raised_hp3 = RoundToNearest(float(g_iPlayerMaxHP[client3]) * g_fArenaHPRatio[arena_index]);
 			g_iPlayerHP[client3] = raised_hp3;
 			SetEntProp(client3, Prop_Data, "m_iHealth", raised_hp3);
 		}
 		if (IsPlayerAlive(client4)) {
 			TF2_RegeneratePlayer(client4);
-			int raised_hp4 = RoundToNearest(float(g_iPlayerMaxHP[client4])*g_fArenaHPRatio[arena_index]);
+			int raised_hp4 = RoundToNearest(float(g_iPlayerMaxHP[client4]) * g_fArenaHPRatio[arena_index]);
 			g_iPlayerHP[client4] = raised_hp4;
 			SetEntProp(client4, Prop_Data, "m_iHealth", raised_hp4);
 		}
