@@ -260,24 +260,24 @@ public void OnPluginStart() {
 	LoadTranslations("common.phrases");
 	LoadTranslations("mgemod.phrases");
 	//ConVars
-	CreateConVar("sm_mgemod_version", PL_VERSION, "MGEMod version", FCVAR_PLUGIN|FCVAR_SPONLY|FCVAR_REPLICATED|FCVAR_NOTIFY);
-	gcvar_fragLimit = CreateConVar("mgemod_fraglimit", "3", "Default frag limit in duel", FCVAR_PLUGIN, true, 1.0);
-	gcvar_allowedClasses = CreateConVar("mgemod_allowed_classes", "soldier demoman scout", "Classes that players allowed to choose by default", FCVAR_PLUGIN);
-	gcvar_blockFallDamage = CreateConVar("mgemod_blockdmg_fall", "0", "Block falldamage? (0 = Disabled)", FCVAR_PLUGIN, true, 0.0, true, 1.0);
-	gcvar_dbConfig = CreateConVar("mgemod_dbconfig", "mgemod", "Name of database config", FCVAR_PLUGIN);
-	gcvar_stats = CreateConVar("mgemod_stats", "1", "Enable/Disable stats.", FCVAR_PLUGIN);
-	gcvar_airshotHeight = CreateConVar("mgemod_airshot_height", "80", "The minimum height at which it will count airshot", FCVAR_PLUGIN, true, 10.0, true, 500.0);
-	gcvar_RocketForceX = CreateConVar("mgemod_endif_force_x", "1.1", "The amount by which to multiply the X push force on Endif.", FCVAR_PLUGIN, true, 1.0, true, 10.0);
-	gcvar_RocketForceY = CreateConVar("mgemod_endif_force_y", "1.1", "The amount by which to multiply the Y push force on Endif.", FCVAR_PLUGIN, true, 1.0, true, 10.0);
-	gcvar_RocketForceZ = CreateConVar("mgemod_endif_force_z", "2.15", "The amount by which to multiply the Z push force on Endif.", FCVAR_PLUGIN, true, 1.0, true, 10.0);
-	gcvar_autoCvar = CreateConVar("mgemod_autocvar", "1", "Automatically set reccomended game cvars? (0 = Disabled)", FCVAR_PLUGIN, true, 0.0, true, 1.0);
-	gcvar_bballParticle_red = CreateConVar("mgemod_bball_particle_red", "player_intel_trail_red", "Particle effect to attach to Red players in BBall.", FCVAR_PLUGIN);
-	gcvar_bballParticle_blue = CreateConVar("mgemod_bball_particle_blue", "player_intel_trail_blue", "Particle effect to attach to Blue players in BBall.", FCVAR_PLUGIN);
+	CreateConVar("sm_mgemod_version", PL_VERSION, "MGEMod version", FCVAR_SPONLY|FCVAR_REPLICATED|FCVAR_NOTIFY);
+	gcvar_fragLimit = CreateConVar("mgemod_fraglimit", "3", "Default frag limit in duel", FCVAR_NONE, true, 1.0);
+	gcvar_allowedClasses = CreateConVar("mgemod_allowed_classes", "soldier demoman scout", "Classes that players allowed to choose by default", FCVAR_NONE);
+	gcvar_blockFallDamage = CreateConVar("mgemod_blockdmg_fall", "0", "Block falldamage? (0 = Disabled)", FCVAR_NONE, true, 0.0, true, 1.0);
+	gcvar_dbConfig = CreateConVar("mgemod_dbconfig", "mgemod", "Name of database config", FCVAR_NONE);
+	gcvar_stats = CreateConVar("mgemod_stats", "1", "Enable/Disable stats.", FCVAR_NONE);
+	gcvar_airshotHeight = CreateConVar("mgemod_airshot_height", "80", "The minimum height at which it will count airshot", FCVAR_NONE, true, 10.0, true, 500.0);
+	gcvar_RocketForceX = CreateConVar("mgemod_endif_force_x", "1.1", "The amount by which to multiply the X push force on Endif.", FCVAR_NONE, true, 1.0, true, 10.0);
+	gcvar_RocketForceY = CreateConVar("mgemod_endif_force_y", "1.1", "The amount by which to multiply the Y push force on Endif.", FCVAR_NONE, true, 1.0, true, 10.0);
+	gcvar_RocketForceZ = CreateConVar("mgemod_endif_force_z", "2.15", "The amount by which to multiply the Z push force on Endif.", FCVAR_NONE, true, 1.0, true, 10.0);
+	gcvar_autoCvar = CreateConVar("mgemod_autocvar", "1", "Automatically set reccomended game cvars? (0 = Disabled)", FCVAR_NONE, true, 0.0, true, 1.0);
+	gcvar_bballParticle_red = CreateConVar("mgemod_bball_particle_red", "player_intel_trail_red", "Particle effect to attach to Red players in BBall.", FCVAR_NONE);
+	gcvar_bballParticle_blue = CreateConVar("mgemod_bball_particle_blue", "player_intel_trail_blue", "Particle effect to attach to Blue players in BBall.", FCVAR_NONE);
 	gcvar_WfP = FindConVar("mp_waitingforplayers_cancel");
-	gcvar_midairHP = CreateConVar("mgemod_midair_hp", "5", "", FCVAR_PLUGIN, true, 1.0);
-	gcvar_noDisplayRating = CreateConVar("mgemod_hide_rating", "0", "Hide the in-game display of rating points. They will still be tracked in the database.", FCVAR_PLUGIN);
-	gcvar_reconnectInterval = CreateConVar("mgemod_reconnect_interval", "5", "How long (in minutes) to wait between database reconnection attempts.", FCVAR_PLUGIN);
-	gcvar_spawnFile = CreateConVar("mgemod_spawnfile", "configs/mgemod_spawns.cfg", "Spawn file", FCVAR_PLUGIN);
+	gcvar_midairHP = CreateConVar("mgemod_midair_hp", "5", "", FCVAR_NONE, true, 1.0);
+	gcvar_noDisplayRating = CreateConVar("mgemod_hide_rating", "0", "Hide the in-game display of rating points. They will still be tracked in the database.", FCVAR_NONE);
+	gcvar_reconnectInterval = CreateConVar("mgemod_reconnect_interval", "5", "How long (in minutes) to wait between database reconnection attempts.", FCVAR_NONE);
+	gcvar_spawnFile = CreateConVar("mgemod_spawnfile", "configs/mgemod_spawns.cfg", "Spawn file", FCVAR_NONE);
 
 	// Populate global variables with their corresponding convar values.
 	g_iDefaultFragLimit = GetConVarInt(gcvar_fragLimit);
