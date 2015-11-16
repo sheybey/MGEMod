@@ -73,8 +73,9 @@ int
 	g_iAirshotHeight = 80;
 
 // Database
+Database
+	db = null; // Connection to SQL database.
 Handle
-	db = null, // Connection to SQL database.
 	g_hDBReconnectTimer = null;
 char
 	g_sDBConfig[64];
@@ -82,7 +83,7 @@ int
 	g_iReconnectInterval;
 
 // Global CVar Handles
-Handle
+ConVar
 	gcvar_WfP = null,
 	gcvar_fragLimit = null,
 	gcvar_allowedClasses = null,
@@ -262,39 +263,39 @@ public void OnPluginStart() {
 	//ConVars
 	CreateConVar("sm_mgemod_version", PL_VERSION, "MGEMod version", FCVAR_SPONLY|FCVAR_REPLICATED|FCVAR_NOTIFY);
 	gcvar_fragLimit = CreateConVar("mgemod_fraglimit", "3", "Default frag limit in duel", FCVAR_NONE, true, 1.0);
-	gcvar_allowedClasses = CreateConVar("mgemod_allowed_classes", "soldier demoman scout", "Classes that players allowed to choose by default", FCVAR_NONE);
+	gcvar_allowedClasses = CreateConVar("mgemod_allowed_classes", "soldier demoman scout", "Classes that players allowed to choose by default");
 	gcvar_blockFallDamage = CreateConVar("mgemod_blockdmg_fall", "0", "Block falldamage? (0 = Disabled)", FCVAR_NONE, true, 0.0, true, 1.0);
-	gcvar_dbConfig = CreateConVar("mgemod_dbconfig", "mgemod", "Name of database config", FCVAR_NONE);
-	gcvar_stats = CreateConVar("mgemod_stats", "1", "Enable/Disable stats.", FCVAR_NONE);
+	gcvar_dbConfig = CreateConVar("mgemod_dbconfig", "mgemod", "Name of database config");
+	gcvar_stats = CreateConVar("mgemod_stats", "1", "Enable/Disable stats.");
 	gcvar_airshotHeight = CreateConVar("mgemod_airshot_height", "80", "The minimum height at which it will count airshot", FCVAR_NONE, true, 10.0, true, 500.0);
 	gcvar_RocketForceX = CreateConVar("mgemod_endif_force_x", "1.1", "The amount by which to multiply the X push force on Endif.", FCVAR_NONE, true, 1.0, true, 10.0);
 	gcvar_RocketForceY = CreateConVar("mgemod_endif_force_y", "1.1", "The amount by which to multiply the Y push force on Endif.", FCVAR_NONE, true, 1.0, true, 10.0);
 	gcvar_RocketForceZ = CreateConVar("mgemod_endif_force_z", "2.15", "The amount by which to multiply the Z push force on Endif.", FCVAR_NONE, true, 1.0, true, 10.0);
 	gcvar_autoCvar = CreateConVar("mgemod_autocvar", "1", "Automatically set reccomended game cvars? (0 = Disabled)", FCVAR_NONE, true, 0.0, true, 1.0);
-	gcvar_bballParticle_red = CreateConVar("mgemod_bball_particle_red", "player_intel_trail_red", "Particle effect to attach to Red players in BBall.", FCVAR_NONE);
-	gcvar_bballParticle_blue = CreateConVar("mgemod_bball_particle_blue", "player_intel_trail_blue", "Particle effect to attach to Blue players in BBall.", FCVAR_NONE);
+	gcvar_bballParticle_red = CreateConVar("mgemod_bball_particle_red", "player_intel_trail_red", "Particle effect to attach to Red players in BBall.");
+	gcvar_bballParticle_blue = CreateConVar("mgemod_bball_particle_blue", "player_intel_trail_blue", "Particle effect to attach to Blue players in BBall.");
 	gcvar_WfP = FindConVar("mp_waitingforplayers_cancel");
 	gcvar_midairHP = CreateConVar("mgemod_midair_hp", "5", "", FCVAR_NONE, true, 1.0);
-	gcvar_noDisplayRating = CreateConVar("mgemod_hide_rating", "0", "Hide the in-game display of rating points. They will still be tracked in the database.", FCVAR_NONE);
-	gcvar_reconnectInterval = CreateConVar("mgemod_reconnect_interval", "5", "How long (in minutes) to wait between database reconnection attempts.", FCVAR_NONE);
-	gcvar_spawnFile = CreateConVar("mgemod_spawnfile", "configs/mgemod_spawns.cfg", "Spawn file", FCVAR_NONE);
+	gcvar_noDisplayRating = CreateConVar("mgemod_hide_rating", "0", "Hide the in-game display of rating points. They will still be tracked in the database.");
+	gcvar_reconnectInterval = CreateConVar("mgemod_reconnect_interval", "5", "How long (in minutes) to wait between database reconnection attempts.");
+	gcvar_spawnFile = CreateConVar("mgemod_spawnfile", "configs/mgemod_spawns.cfg", "Spawn file");
 
 	// Populate global variables with their corresponding convar values.
-	g_iDefaultFragLimit = GetConVarInt(gcvar_fragLimit);
-	g_bBlockFallDamage = GetConVarInt(gcvar_blockFallDamage) ? true : false;
-	GetConVarString(gcvar_dbConfig, g_sDBConfig, sizeof(g_sDBConfig));
-	g_bNoStats = (GetConVarBool(gcvar_stats)) ? false : true;
-	g_iAirshotHeight = GetConVarInt(gcvar_airshotHeight);
-	g_iMidairHP = GetConVarInt(gcvar_midairHP);
-	g_fRocketForceX = GetConVarFloat(gcvar_RocketForceX);
-	g_fRocketForceY = GetConVarFloat(gcvar_RocketForceY);
-	g_fRocketForceZ = GetConVarFloat(gcvar_RocketForceZ);
-	g_bAutoCvar = GetConVarInt(gcvar_autoCvar) ? true : false;
-	GetConVarString(gcvar_bballParticle_red, g_sBBallParticleRed, sizeof(g_sBBallParticleRed));
-	GetConVarString(gcvar_bballParticle_blue, g_sBBallParticleBlue, sizeof(g_sBBallParticleBlue));
-	g_bNoDisplayRating = GetConVarInt(gcvar_noDisplayRating) ? true : false;
-	g_iReconnectInterval = GetConVarInt(gcvar_reconnectInterval);
-	GetConVarString(gcvar_spawnFile, g_spawnFile, sizeof(g_spawnFile));
+	g_iDefaultFragLimit = gcvar_fragLimit.IntValue;
+	g_bBlockFallDamage = gcvar_blockFallDamage.BoolValue;
+	gcvar_dbConfig.GetString(g_sDBConfig, sizeof(g_sDBConfig));
+	g_bNoStats = gcvar_stats.BoolValue ? false : true; // why the inversion?
+	g_iAirshotHeight = gcvar_airshotHeight.IntValue;
+	g_iMidairHP = gcvar_midairHP.IntValue;
+	g_fRocketForceX = gcvar_RocketForceX.FloatValue;
+	g_fRocketForceY = gcvar_RocketForceY.FloatValue;
+	g_fRocketForceZ = gcvar_RocketForceZ.FloatValue;
+	g_bAutoCvar = gcvar_autoCvar.BoolValue;
+	gcvar_bballParticle_red.GetString(g_sBBallParticleRed, sizeof(g_sBBallParticleRed));
+	gcvar_bballParticle_blue.GetString(g_sBBallParticleBlue, sizeof(g_sBBallParticleBlue));
+	g_bNoDisplayRating = gcvar_noDisplayRating.BoolValue;
+	g_iReconnectInterval = gcvar_reconnectInterval.IntValue;
+	gcvar_spawnFile.GetString(g_spawnFile, sizeof(g_spawnFile));
 	for (int i = 0; i < MAXARENAS + 1; ++i) {
 		g_bTimerRunning[i] = false;
 		g_fCappedTime[i] = 0.0;
@@ -311,22 +312,22 @@ public void OnPluginStart() {
 	}
 
 	// Hook convar changes.
-	HookConVarChange(gcvar_spawnFile, handler_ConVarChange);
-	HookConVarChange(gcvar_fragLimit, handler_ConVarChange);
-	HookConVarChange(gcvar_allowedClasses, handler_ConVarChange);
-	HookConVarChange(gcvar_blockFallDamage, handler_ConVarChange);
-	HookConVarChange(gcvar_dbConfig, handler_ConVarChange);
-	HookConVarChange(gcvar_stats, handler_ConVarChange);
-	HookConVarChange(gcvar_airshotHeight, handler_ConVarChange);
-	HookConVarChange(gcvar_midairHP, handler_ConVarChange);
-	HookConVarChange(gcvar_RocketForceX, handler_ConVarChange);
-	HookConVarChange(gcvar_RocketForceY, handler_ConVarChange);
-	HookConVarChange(gcvar_RocketForceZ, handler_ConVarChange);
-	HookConVarChange(gcvar_autoCvar, handler_ConVarChange);
-	HookConVarChange(gcvar_bballParticle_red, handler_ConVarChange);
-	HookConVarChange(gcvar_bballParticle_blue, handler_ConVarChange);
-	HookConVarChange(gcvar_noDisplayRating, handler_ConVarChange);
-	HookConVarChange(gcvar_reconnectInterval, handler_ConVarChange);
+	gcvar_spawnFile.AddChangeHook(handler_ConVarChange);
+	gcvar_fragLimit.AddChangeHook(handler_ConVarChange);
+	gcvar_allowedClasses.AddChangeHook(handler_ConVarChange);
+	gcvar_blockFallDamage.AddChangeHook(handler_ConVarChange);
+	gcvar_dbConfig.AddChangeHook(handler_ConVarChange);
+	gcvar_stats.AddChangeHook(handler_ConVarChange);
+	gcvar_airshotHeight.AddChangeHook(handler_ConVarChange);
+	gcvar_midairHP.AddChangeHook(handler_ConVarChange);
+	gcvar_RocketForceX.AddChangeHook(handler_ConVarChange);
+	gcvar_RocketForceY.AddChangeHook(handler_ConVarChange);
+	gcvar_RocketForceZ.AddChangeHook(handler_ConVarChange);
+	gcvar_autoCvar.AddChangeHook(handler_ConVarChange);
+	gcvar_bballParticle_red.AddChangeHook(handler_ConVarChange);
+	gcvar_bballParticle_blue.AddChangeHook(handler_ConVarChange);
+	gcvar_noDisplayRating.AddChangeHook(handler_ConVarChange);
+	gcvar_reconnectInterval.AddChangeHook(handler_ConVarChange);
 
 	// Create/register client commands.
 	RegConsoleCmd("mgemod", Command_Menu, "MGEMod Menu");
@@ -406,7 +407,7 @@ public void OnMapStart() {
 	//Used for ultiduo/koth arenas
 	PrecacheModel(MODEL_POINT, true);
 	
-	g_bNoStats = (GetConVarBool(gcvar_stats)) ? false : true; /* Reset this variable, since it is forced to false during Event_WinPanel */
+	g_bNoStats = gcvar_stats.BoolValue ? false : true; /* Reset this variable, since it is forced to false during Event_WinPanel */
 	
 	// Spawns
 	int isMapAm = LoadSpawnPoints();
@@ -468,7 +469,7 @@ public void OnMapStart() {
  * -------------------------------------------------------------------------- */
 public void OnMapEnd() {
 	g_hDBReconnectTimer = null;
-	g_bNoStats = (GetConVarBool(gcvar_stats)) ? false : true;
+	g_bNoStats = gcvar_stats.BoolValue ? false : true;
 
 	UnhookEvent("player_death", Event_PlayerDeath, EventHookMode_Pre);
 	UnhookEvent("player_spawn", Event_PlayerSpawn, EventHookMode_Post);
@@ -520,10 +521,10 @@ public void OnClientPostAdminCheck(int client) {
 			for (int i = 1; i <= MaxClients; i++) {
 				if (g_bPlayerAskedForBot[i]) {
 					int arena_index = g_iPlayerArena[i];		
-					Handle pk;
+					DataPack pk = CreateDataPack();
 					CreateDataTimer(1.5, Timer_AddBotInQueue, pk);
-					WritePackCell(pk, GetClientUserId(client));
-					WritePackCell(pk, arena_index);
+					pk.WriteCell(GetClientUserId(client));
+					pk.WriteCell(arena_index);
 					g_iPlayerRating[client] = 1551;
 					g_bPlayerAskedForBot[i] = false;
 					break;
@@ -540,10 +541,10 @@ public void OnClientPostAdminCheck(int client) {
 			{
 				char steamid_dirty[31], steamid[64], query[256];
 				GetClientAuthId(client, AuthId_Steam2, steamid_dirty, sizeof(steamid_dirty));
-				SQL_EscapeString(db, steamid_dirty, steamid, sizeof(steamid));
+				db.Escape(steamid_dirty, steamid, sizeof(steamid));
 				strcopy(g_sPlayerSteamID[client], 32, steamid);
 				Format(query, sizeof(query), "SELECT rating, hitblip, wins, losses FROM mgemod_stats WHERE steamid='%s' LIMIT 1", steamid);
-				SQL_TQuery(db, T_SQLQueryOnConnect, query, client);
+				db.Query(T_SQLQueryOnConnect, query, client);
 			}
 		}
 	}
@@ -600,20 +601,20 @@ public void OnClientDisconnect(int client) {
 			} else {
 				
 				if (foe && IsFakeClient(foe)) {
-					Handle cvar = FindConVar("tf_bot_quota");
-					int quota = GetConVarInt(cvar);
+					ConVar cvar = FindConVar("tf_bot_quota");
+					int quota = cvar.IntValue;
 					ServerCommand("tf_bot_quota %d", quota - 1);
 				}
 				
 				if (foe2 && IsFakeClient(foe2)) {
-					Handle cvar = FindConVar("tf_bot_quota");
-					int quota = GetConVarInt(cvar);
+					ConVar cvar = FindConVar("tf_bot_quota");
+					int quota = cvar.IntValue;
 					ServerCommand("tf_bot_quota %d", quota - 1);
 				}
 				
 				if (player_teammate && IsFakeClient(player_teammate)) {
-					Handle cvar = FindConVar("tf_bot_quota");
-					int quota = GetConVarInt(cvar);
+					ConVar cvar = FindConVar("tf_bot_quota");
+					int quota = cvar.IntValue;
 					ServerCommand("tf_bot_quota %d", quota - 1);
 				}
 
@@ -641,8 +642,8 @@ public void OnClientDisconnect(int client) {
 
 			} else {
 				if (foe && IsFakeClient(foe)) {
-					Handle cvar = FindConVar("tf_bot_quota");
-					int quota = GetConVarInt(cvar);
+					ConVar cvar = FindConVar("tf_bot_quota");
+					int quota = cvar.IntValue;
 					ServerCommand("tf_bot_quota %d", quota - 1);
 				}
 
@@ -1552,8 +1553,6 @@ void ShowSpecHudToClient(int client) {
 					Format(report, sizeof(report), "%s\n%N (%d): %d", report, red_f1, g_iPlayerRating[red_f1], g_iArenaScore[arena_index][SLOT_ONE]);
 				}
 			}
-			
-			
 		}
 		if (blu_f1) {
 			if (blu_f2) {
@@ -1731,8 +1730,8 @@ void RemoveFromQueue(int client, bool calcstats=false, bool specfix=false) {
 
 			} else {
 				if (foe && IsFakeClient(foe)) {
-					Handle cvar = FindConVar("tf_bot_quota");
-					int quota = GetConVarInt(cvar);
+					ConVar cvar = FindConVar("tf_bot_quota");
+					int quota = cvar.IntValue;
 					ServerCommand("tf_bot_quota %d", quota - 1);
 				}
 
@@ -1796,8 +1795,8 @@ void RemoveFromQueue(int client, bool calcstats=false, bool specfix=false) {
 
 			} else {
 				if (foe && IsFakeClient(foe)) {
-					Handle cvar = FindConVar("tf_bot_quota");
-					int quota = GetConVarInt(cvar);
+					ConVar cvar = FindConVar("tf_bot_quota");
+					int quota = cvar.IntValue;
 					ServerCommand("tf_bot_quota %d", quota - 1);
 				}
 
@@ -1885,7 +1884,7 @@ void AddInQueue(int client, int arena_index, bool showmsg = true, int playerPref
 			if (player_slot == SLOT_FOUR + 1) {
 				CPrintToChat(client, "%t", "NextInLine");
 			} else {
-				CPrintToChat(client, "%t", "InLine", player_slot-SLOT_FOUR);
+				CPrintToChat(client, "%t", "InLine", player_slot - SLOT_FOUR);
 			}
 		}
 	} else {
@@ -1938,8 +1937,8 @@ void CalcELO(int winner, int loser) {
 	int time = GetTime();
 	char query[512], sCleanArenaname[128], sCleanMapName[128];
 
-	SQL_EscapeString(db, g_sArenaName[g_iPlayerArena[winner]], sCleanArenaname, sizeof(sCleanArenaname));
-	SQL_EscapeString(db, g_sMapName, sCleanMapName, sizeof(sCleanMapName));
+	db.Escape(g_sArenaName[g_iPlayerArena[winner]], sCleanArenaname, sizeof(sCleanArenaname));
+	db.Escape(g_sMapName, sCleanMapName, sizeof(sCleanMapName));
 
 	if (IsValidClient(winner) && !g_bNoDisplayRating) {
 		CPrintToChat(winner, "%t", "GainedPoints", winnerscore);
@@ -1958,22 +1957,22 @@ void CalcELO(int winner, int loser) {
 	if (g_bUseSQLite) {
 		Format(query, sizeof(query), 	"INSERT INTO mgemod_duels VALUES ('%s', '%s', %i, %i, %i, %i, '%s', '%s')", 
 										g_sPlayerSteamID[winner], g_sPlayerSteamID[loser], g_iArenaScore[arena_index][winner_team_slot], g_iArenaScore[arena_index][loser_team_slot], g_iArenaFraglimit[arena_index], time, g_sMapName, g_sArenaName[arena_index]);
-		SQL_TQuery(db, SQLErrorCheckCallback, query);
+		db.Query(SQLErrorCheckCallback, query);
 	} else {
 		Format(query, sizeof(query), 	"INSERT INTO mgemod_duels (winner, loser, winnerscore, loserscore, winlimit, gametime, mapname, arenaname) VALUES ('%s', '%s', %i, %i, %i, %i, '%s', '%s')", 
 										g_sPlayerSteamID[winner], g_sPlayerSteamID[loser], g_iArenaScore[arena_index][winner_team_slot], g_iArenaScore[arena_index][loser_team_slot], g_iArenaFraglimit[arena_index], time, g_sMapName, g_sArenaName[arena_index]);
-		SQL_TQuery(db, SQLErrorCheckCallback, query);
+		db.Query(SQLErrorCheckCallback, query);
 	}
 
 	//winner's stats
 	Format(query, sizeof(query), 	"UPDATE mgemod_stats SET rating=%i, wins=wins+1, lastplayed=%i WHERE steamid='%s'", 
 									g_iPlayerRating[winner], time, g_sPlayerSteamID[winner]);
-	SQL_TQuery(db, SQLErrorCheckCallback, query);
+	db.Query(SQLErrorCheckCallback, query);
 
 	//loser's stats
 	Format(query, sizeof(query), 	"UPDATE mgemod_stats SET rating=%i, losses=losses+1, lastplayed=%i WHERE steamid='%s'", 
 									g_iPlayerRating[loser], time, g_sPlayerSteamID[loser]);
-	SQL_TQuery(db, SQLErrorCheckCallback, query);
+	db.Query(SQLErrorCheckCallback, query);
 }
 
 void CalcELO2(int winner, int winner2, int loser, int loser2) {
@@ -2001,8 +2000,8 @@ void CalcELO2(int winner, int winner2, int loser, int loser2) {
 	int time = GetTime();
 	char query[512], sCleanArenaname[128], sCleanMapName[128];
 
-	SQL_EscapeString(db, g_sArenaName[g_iPlayerArena[winner]], sCleanArenaname, sizeof(sCleanArenaname));
-	SQL_EscapeString(db, g_sMapName, sCleanMapName, sizeof(sCleanMapName));
+	db.Escape(g_sArenaName[g_iPlayerArena[winner]], sCleanArenaname, sizeof(sCleanArenaname));
+	db.Escape(g_sMapName, sCleanMapName, sizeof(sCleanMapName));
 
 	if (IsValidClient(winner) && !g_bNoDisplayRating) {
 		CPrintToChat(winner, "%t", "GainedPoints", winnerscore);
@@ -2025,32 +2024,32 @@ void CalcELO2(int winner, int winner2, int loser, int loser2) {
 	if (g_bUseSQLite) {
 		Format(query, sizeof(query), 	"INSERT INTO mgemod_duels_2v2 VALUES ('%s', '%s', '%s', '%s', %i, %i, %i, %i, '%s', '%s')", 
 										g_sPlayerSteamID[winner], g_sPlayerSteamID[winner2], g_sPlayerSteamID[loser], g_sPlayerSteamID[loser2], g_iArenaScore[arena_index][winner_team_slot], g_iArenaScore[arena_index][loser_team_slot], g_iArenaFraglimit[arena_index], time, g_sMapName, g_sArenaName[arena_index]);
-		SQL_TQuery(db, SQLErrorCheckCallback, query);
+		db.Query(SQLErrorCheckCallback, query);
 	} else {
 		Format(query, sizeof(query), 	"INSERT INTO mgemod_duels_2v2 (winner, winner2, loser, loser2, winnerscore, loserscore, winlimit, gametime, mapname, arenaname) VALUES ('%s', '%s', %i, %i, %i, %i, '%s', '%s')", 
 										g_sPlayerSteamID[winner], g_sPlayerSteamID[winner2], g_sPlayerSteamID[loser], g_sPlayerSteamID[loser2], g_iArenaScore[arena_index][winner_team_slot], g_iArenaScore[arena_index][loser_team_slot], g_iArenaFraglimit[arena_index], time, g_sMapName, g_sArenaName[arena_index]);
-		SQL_TQuery(db, SQLErrorCheckCallback, query);
+		db.Query(SQLErrorCheckCallback, query);
 	}
 
 	//winner's stats
 	Format(query, sizeof(query), 	"UPDATE mgemod_stats SET rating=%i, wins=wins+1, lastplayed=%i WHERE steamid='%s'", 
 									g_iPlayerRating[winner], time, g_sPlayerSteamID[winner]);
-	SQL_TQuery(db, SQLErrorCheckCallback, query);
+	db.Query(SQLErrorCheckCallback, query);
 	
 	//winner's teammate stats
 	Format(query, sizeof(query), 	"UPDATE mgemod_stats SET rating=%i, wins=wins+1, lastplayed=%i WHERE steamid='%s'", 
 									g_iPlayerRating[winner2], time, g_sPlayerSteamID[winner2]);
-	SQL_TQuery(db, SQLErrorCheckCallback, query);
+	db.Query(SQLErrorCheckCallback, query);
 
 	//loser's stats
 	Format(query, sizeof(query), 	"UPDATE mgemod_stats SET rating=%i, losses=losses+1, lastplayed=%i WHERE steamid='%s'", 
 									g_iPlayerRating[loser], time, g_sPlayerSteamID[loser]);
-	SQL_TQuery(db, SQLErrorCheckCallback, query);
+	db.Query(SQLErrorCheckCallback, query);
 	
 	//loser's teammate stats
 	Format(query, sizeof(query), 	"UPDATE mgemod_stats SET rating=%i, losses=losses+1, lastplayed=%i WHERE steamid='%s'", 
 									g_iPlayerRating[loser2], time, g_sPlayerSteamID[loser2]);
-	SQL_TQuery(db, SQLErrorCheckCallback, query);
+	db.Query(SQLErrorCheckCallback, query);
 }
 // ====[ UTIL ]====================================================
 bool LoadSpawnPoints() {
@@ -2060,7 +2059,7 @@ bool LoadSpawnPoints() {
 	char spawn[64];
 	GetCurrentMap(g_sMapName, sizeof(g_sMapName));
 
-	Handle kv = CreateKeyValues("SpawnConfig");
+	KeyValues kv = CreateKeyValues("SpawnConfig");
 
 	char spawnCo[6][16];
 	char kvmap[32];
@@ -2071,24 +2070,24 @@ bool LoadSpawnPoints() {
 	for (i = 0; i <= MAXARENAS; i++)
 		g_iArenaSpawns[i] = 0;
 
-	if (FileToKeyValues(kv, txtfile)) {
-		if (KvGotoFirstSubKey(kv)) {
+	if (kv.ImportFromFile(txtfile)) {
+		if (kv.GotoFirstSubKey()) {
 			do {
-				KvGetSectionName(kv, kvmap, 64);
+				kv.GetSectionName(kvmap, 64);
 				if (StrEqual(g_sMapName, kvmap, false)) {
-					if (KvGotoFirstSubKey(kv)) {
+					if (kv.GotoFirstSubKey()) {
 						do {
 							g_iArenaCount++;
-							KvGetSectionName(kv, g_sArenaName[g_iArenaCount], 64);
+							kv.GetSectionName(g_sArenaName[g_iArenaCount], 64);
 							int id;
-							if (KvGetNameSymbol(kv, "1", id)) {
+							if (kv.GetNameSymbol("1", id)) {
 								char intstr[4];
 								char intstr2[4];
 								do {
 									g_iArenaSpawns[g_iArenaCount]++;
 									IntToString(g_iArenaSpawns[g_iArenaCount], intstr, sizeof(intstr));
 									IntToString(g_iArenaSpawns[g_iArenaCount] + 1, intstr2, sizeof(intstr2));
-									KvGetString(kv, intstr, spawn, sizeof(spawn));
+									kv.GetString(intstr, spawn, sizeof(spawn));
 									count = ExplodeString(spawn, " ", spawnCo, 6, 16);
 									if (count == 6) {
 										for (i = 0; i < 3; i++) {
@@ -2105,59 +2104,61 @@ bool LoadSpawnPoints() {
 										g_fArenaSpawnAngles[g_iArenaCount][g_iArenaSpawns[g_iArenaCount]][1] = StringToFloat(spawnCo[3]);
 										g_fArenaSpawnAngles[g_iArenaCount][g_iArenaSpawns[g_iArenaCount]][2] = 0.0;
 									} else {
+										delete kv;
 										SetFailState("Error in cfg file. Wrong number of parameters (%d) on spawn <%i> in arena <%s>", count, g_iArenaSpawns[g_iArenaCount], g_sArenaName[g_iArenaCount]);
 									}
-								} while (KvGetNameSymbol(kv, intstr2, id));
+								} while (kv.GetNameSymbol(intstr2, id));
 								LogMessage("Loaded %d spawns on arena %s.", g_iArenaSpawns[g_iArenaCount], g_sArenaName[g_iArenaCount]);
 							} else {
 								LogError("Could not load spawns on arena %s.", g_sArenaName[g_iArenaCount]);
 							}
 
 							//optional parameters
-							g_iArenaFraglimit[g_iArenaCount] = KvGetNum(kv, "fraglimit", g_iDefaultFragLimit);
-							g_iArenaMinRating[g_iArenaCount] = KvGetNum(kv, "minrating", -1);
-							g_iArenaMaxRating[g_iArenaCount] = KvGetNum(kv, "maxrating", -1);
-							g_bArenaMidair[g_iArenaCount] = KvGetNum(kv, "midair", 0) ? true : false ;
-							g_iArenaCdTime[g_iArenaCount] = KvGetNum(kv, "cdtime", DEFAULT_CDTIME);
-							g_bArenaMGE[g_iArenaCount] = KvGetNum(kv, "mge", 0) ? true : false ;
-							g_fArenaHPRatio[g_iArenaCount] = KvGetFloat(kv, "hpratio", 1.5);
-							g_bArenaEndif[g_iArenaCount] = KvGetNum(kv, "endif", 0) ? true : false ;
-							g_bArenaBBall[g_iArenaCount] = KvGetNum(kv, "bball", 0) ? true : false ;
-							g_bVisibleHoops[g_iArenaCount] = KvGetNum(kv, "vishoop", 0) ? true : false ;
-							g_iArenaEarlyLeave[g_iArenaCount] = KvGetNum(kv, "earlyleave", 0);
-							g_bArenaInfAmmo[g_iArenaCount] = KvGetNum(kv, "infammo", 1) ? true : false ;
-							g_bArenaShowHPToPlayers[g_iArenaCount] = KvGetNum(kv, "showhp", 1) ? true : false ;
-							g_fArenaMinSpawnDist[g_iArenaCount] = KvGetFloat(kv, "mindist", 100.0);
-							g_bFourPersonArena[g_iArenaCount] = KvGetNum(kv, "4player", 0) ? true : false;
-							g_fArenaRespawnTime[g_iArenaCount] = KvGetFloat(kv, "respawntime", 0.1);
-							g_bArenaAmmomod[g_iArenaCount] = KvGetNum(kv, "ammomod", 0) ? true : false;
-							g_bArenaUltiduo[g_iArenaCount] = KvGetNum(kv, "ultiduo", 0) ? true : false;
-							g_bArenaKoth[g_iArenaCount] = KvGetNum(kv, "koth", 0) ? true : false;
-							g_bArenaTurris[g_iArenaCount] = KvGetNum(kv, "turris", 0) ? true : false;
-							g_iDefaultCapTime[g_iArenaCount] = KvGetNum(kv, "Timer", 180);
+							g_iArenaFraglimit[g_iArenaCount] = kv.GetNum("fraglimit", g_iDefaultFragLimit);
+							g_iArenaMinRating[g_iArenaCount] = kv.GetNum("minrating", -1);
+							g_iArenaMaxRating[g_iArenaCount] = kv.GetNum("maxrating", -1);
+							g_bArenaMidair[g_iArenaCount] = kv.GetNum("midair", 0) ? true : false ;
+							g_iArenaCdTime[g_iArenaCount] = kv.GetNum("cdtime", DEFAULT_CDTIME);
+							g_bArenaMGE[g_iArenaCount] = kv.GetNum("mge", 0) ? true : false ;
+							g_fArenaHPRatio[g_iArenaCount] = kv.GetFloat("hpratio", 1.5);
+							g_bArenaEndif[g_iArenaCount] = kv.GetNum("endif", 0) ? true : false ;
+							g_bArenaBBall[g_iArenaCount] = kv.GetNum("bball", 0) ? true : false ;
+							g_bVisibleHoops[g_iArenaCount] = kv.GetNum("vishoop", 0) ? true : false ;
+							g_iArenaEarlyLeave[g_iArenaCount] = kv.GetNum("earlyleave", 0);
+							g_bArenaInfAmmo[g_iArenaCount] = kv.GetNum("infammo", 1) ? true : false ;
+							g_bArenaShowHPToPlayers[g_iArenaCount] = kv.GetNum("showhp", 1) ? true : false ;
+							g_fArenaMinSpawnDist[g_iArenaCount] = kv.GetFloat("mindist", 100.0);
+							g_bFourPersonArena[g_iArenaCount] = kv.GetNum("4player", 0) ? true : false;
+							g_fArenaRespawnTime[g_iArenaCount] = kv.GetFloat("respawntime", 0.1);
+							g_bArenaAmmomod[g_iArenaCount] = kv.GetNum("ammomod", 0) ? true : false;
+							g_bArenaUltiduo[g_iArenaCount] = kv.GetNum("ultiduo", 0) ? true : false;
+							g_bArenaKoth[g_iArenaCount] = kv.GetNum("koth", 0) ? true : false;
+							g_bArenaTurris[g_iArenaCount] = kv.GetNum("turris", 0) ? true : false;
+							g_iDefaultCapTime[g_iArenaCount] = kv.GetNum("Timer", 180);
 							//parsing allowed classes for current arena
 							char sAllowedClasses[128];
-							KvGetString(kv, "classes", sAllowedClasses, sizeof(sAllowedClasses));
+							kv.GetString("classes", sAllowedClasses, sizeof(sAllowedClasses));
 							LogMessage("%s classes: <%s>", g_sArenaName[g_iArenaCount], sAllowedClasses);
 							ParseAllowedClasses(sAllowedClasses, g_tfctArenaAllowedClasses[g_iArenaCount]); 
-						} while (KvGotoNextKey(kv));
+						} while (kv.GotoNextKey());
 					}
 					break;
 				}
-			} while (KvGotoNextKey(kv));
+			} while (kv.GotoNextKey());
+			delete kv;
 			if (g_iArenaCount) {
 				LogMessage("Loaded %d arenas. MGEMod enabled.", g_iArenaCount);
-				CloseHandle(kv);
 				return true;
 			} else {
-				CloseHandle(kv);
 				return false;
 			}
 		} else {
+			delete kv;
 			LogError("Error in cfg file.");
 			return false;
 		}
 	} else {
+		delete kv;
 		LogError("Error. Can't find cfg file");
 		return false;
 	}
@@ -2166,7 +2167,6 @@ bool LoadSpawnPoints() {
 int ResetPlayer(int client) {
 	int arena_index = g_iPlayerArena[client];
 	int player_slot = g_iPlayerSlot[client];
-	
 	
 	if (!arena_index || !player_slot) {
 		return 0;
@@ -2316,7 +2316,7 @@ void ParseAllowedClasses(const char[] sList, int output[TFClassType]) {
 		count = ExplodeString(sList, " ", a_class, 9, 9);
 	} else {
 		char sDefList[128];
-		GetConVarString(gcvar_allowedClasses, sDefList, sizeof(sDefList));
+		gcvar_allowedClasses.GetString(sDefList, sizeof(sDefList));
 		count = ExplodeString(sDefList, " ", a_class, 9, 9);
 	}
 
@@ -2377,14 +2377,14 @@ void ShowSwapMenu(int client) {
 		
 	char title[128];
 
-	Handle menu = CreateMenu(SwapMenuHandler);
+	Menu menu = CreateMenu(SwapMenuHandler);
 	
 	Format(title, sizeof(title), "%T", "MenuSwap", client);
-	SetMenuTitle(menu, title);
-	AddMenuItem(menu, "yes", "Yes");
-	AddMenuItem(menu, "no", "No");
-	SetMenuExitButton(menu, false);
-	DisplayMenu(menu, client, 20);
+	menu.SetTitle(title);
+	menu.AddItem("yes", "Yes");
+	menu.AddItem("no", "No");
+	menu.ExitButton = false;
+	menu.Display(client, 20);
 }
 
 // ====[ MAIN MENU ]====================================================
@@ -2396,10 +2396,10 @@ void ShowMainMenu(int client, bool listplayers=true) {
 	char title[128];
 	char menu_item[128];
 
-	Handle menu = CreateMenu(Menu_Main);
+	Menu menu = CreateMenu(Menu_Main);
 
 	Format(title, sizeof(title), "%T", "MenuTitle", client);
-	SetMenuTitle(menu, title);
+	menu.SetTitle(title);
 	char si[4];
 
 	for (int i = 1; i <= g_iArenaCount; i++) {
@@ -2422,14 +2422,14 @@ void ShowMainMenu(int client, bool listplayers=true) {
 		}
 
 		IntToString(i, si, sizeof(si));
-		AddMenuItem(menu, si, menu_item);
+		menu.AddItem(si, menu_item);
 	}
 
 	Format(menu_item, sizeof(menu_item), "%T", "MenuRemove", client);
-	AddMenuItem(menu, "1000", menu_item);
+	menu.AddItem("1000", menu_item);
 
-	SetMenuExitButton(menu, true);
-	DisplayMenu(menu, client, 0);
+	menu.ExitButton = true;
+	menu.Display(client, 0);
 
 	char report[128];
 
@@ -2480,7 +2480,7 @@ void ShowMainMenu(int client, bool listplayers=true) {
 	}
 }
 
-public int Menu_Main(Handle menu, MenuAction action, int param1, int param2) { 
+public int Menu_Main(Menu menu, MenuAction action, int param1, int param2) { 
 	switch (action) {
 		case MenuAction_Select: {
 			int client = param1;
@@ -2490,7 +2490,7 @@ public int Menu_Main(Handle menu, MenuAction action, int param1, int param2) {
 			char capt[32];
 			char sanum[32];
 
-			GetMenuItem(menu, param2, sanum, sizeof(sanum), _, capt, sizeof(capt));
+			menu.GetItem(param2, sanum, sizeof(sanum), _, capt, sizeof(capt));
 			int arena_index = StringToInt(sanum);
 
 			if (arena_index > 0 && arena_index <= g_iArenaCount) {
@@ -2528,12 +2528,12 @@ public int Menu_Main(Handle menu, MenuAction action, int param1, int param2) {
 		case MenuAction_Cancel: {
 		}
 		case MenuAction_End: {
-			CloseHandle(menu);
+			delete menu;
 		}
     }
 }
 
-public int SwapMenuHandler(Handle menu, MenuAction action, int param1, int param2) {
+public int SwapMenuHandler(Menu menu, MenuAction action, int param1, int param2) {
 	// If an option was selected, tell the client about the item. 
 	if (action == MenuAction_Select) {
 		if (param2 == 0) {
@@ -2546,14 +2546,14 @@ public int SwapMenuHandler(Handle menu, MenuAction action, int param1, int param
 			int client_teammate = getTeammate(client, g_iPlayerSlot[client], arena_index);
 			swapClasses(client, client_teammate);
 		} else {
-			CloseHandle(menu);
+			delete menu;
 		}
 	// If the menu was cancelled, print a message to the server about it. 
 	} else if (action == MenuAction_Cancel) {
 		PrintToServer("Client %d's menu was cancelled.  Reason: %d", param1, param2);
 	// If the menu has ended, destroy it
 	} else if (action == MenuAction_End) {
-		CloseHandle(menu);
+		delete menu;
 	}
 }
 
@@ -2566,7 +2566,7 @@ void ShowTop5Menu(int client, char[][] name, int[] rating) {
 	char temp[128];
 	//char menu_item[128];
 
-	Handle menu = CreateMenu(Menu_Top5);
+	Menu menu = CreateMenu(Menu_Top5);
 
 	Format(title, sizeof(title), "ELO Rankings \n", client);
 	
@@ -2591,29 +2591,29 @@ void ShowTop5Menu(int client, char[][] name, int[] rating) {
 			//AddMenuItem(menu, si, menu_item);
 		}
 	}
-	SetMenuTitle(menu, title);
+	menu.SetTitle(title);
 	
-	AddMenuItem(menu, "1", "Next");
+	menu.AddItem("1", "Next");
 	if (g_iELOMenuPage[client] != 0) {
-		AddMenuItem(menu, "2", "back");
+		menu.AddItem("2", "back");
 	}
 	
-	SetMenuExitButton(menu, true);
-	DisplayMenu(menu, client, 0);
+	menu.ExitButton = true;
+	menu.Display(client, 0);
 }
 
-public int Menu_Top5(Handle menu, MenuAction action, int param1, int param2) {
+public int Menu_Top5(Menu menu, MenuAction action, int param1, int param2) {
 	switch (action) {
 		case MenuAction_Select: {
 			char info[32];
-			GetMenuItem(menu, param2, info, sizeof(info));
+			menu.GetItem(param2, info, sizeof(info));
 			//If he selected next, query the next menu
 			if (param2 == 0) {
 				g_iELOMenuPage[param1]++;
 				char query[256];
 				Format(query, sizeof(query), "SELECT rating, name FROM mgemod_stats ORDER BY rating DESC LIMIT %i, 5", g_iELOMenuPage[param1] * 5);
 				//int data[] = {param1, param2+5, false};
-				SQL_TQuery(db, T_SQL_Top5, query, param1);
+				db.Query(T_SQL_Top5, query, param1);
 			}
 			//If the player selected back show the previous menu
 			if (param2 == 1) {
@@ -2622,19 +2622,19 @@ public int Menu_Top5(Handle menu, MenuAction action, int param1, int param2) {
 					char query[256];
 					Format(query, sizeof(query), "SELECT rating, name FROM mgemod_stats ORDER BY rating DESC LIMIT 5");
 					//int data[] = {param1, param2-5, true};
-					SQL_TQuery(db, T_SQL_Top5, query, param1);
+					db.Query(T_SQL_Top5, query, param1);
 				} else {
 					char query[256];
 					Format(query, sizeof(query), "SELECT rating, name FROM mgemod_stats ORDER BY rating DESC LIMIT %i, 5", g_iELOMenuPage[param1] * 5);
 					//int data[] = {param1, param2-5, false};
-					SQL_TQuery(db, T_SQL_Top5, query, param1);
+					db.Query(T_SQL_Top5, query, param1);
 				}
 			}
 		}
 		case MenuAction_Cancel: {
 		}
 		case MenuAction_End: {
-			CloseHandle(menu);
+			delete menu;
 		}
     }
 }
@@ -2660,7 +2660,7 @@ public Action BoostVectors(Handle timer, any userid) {
 
 
 // ====[ CVARS ]====================================================
-public void handler_ConVarChange(Handle convar, const char[] oldValue, const char[] newValue) {
+public void handler_ConVarChange(ConVar convar, const char[] oldValue, const char[] newValue) {
 	if (convar == gcvar_blockFallDamage) {
 		StringToInt(newValue) ? (g_bBlockFallDamage = true) : (g_bBlockFallDamage = false);
 		if (g_bBlockFallDamage) {
@@ -2689,7 +2689,7 @@ public void handler_ConVarChange(Handle convar, const char[] oldValue, const cha
 	} else if (convar == gcvar_noDisplayRating) {
 		StringToInt(newValue) ? (g_bNoDisplayRating = true) : (g_bNoDisplayRating = false);
 	} else if (convar == gcvar_stats) {
-		g_bNoStats = (GetConVarBool(gcvar_stats)) ? false : true;
+		g_bNoStats = gcvar_stats.BoolValue ? false : true;
 	} else if (convar == gcvar_reconnectInterval) {
 		g_iReconnectInterval = StringToInt(newValue);
 	} else if (convar == gcvar_dbConfig) {
@@ -2798,7 +2798,7 @@ public Action Command_Top5(int client, int args) {
 	g_iELOMenuPage[client] = 0;
 	char query[256];
 	Format(query, sizeof(query), "SELECT rating, name FROM mgemod_stats ORDER BY rating DESC LIMIT 5");
-	SQL_TQuery(db, T_SQL_Top5, query, client);
+	db.Query(T_SQL_Top5, query, client);
 	return Plugin_Continue;
 }
 
@@ -3039,7 +3039,7 @@ public Action Command_ToogleHitblip(int client, int args) {
 	if (!g_bNoStats) {
 		char query[256];
 		Format(query, sizeof(query), "UPDATE mgemod_stats SET hitblip=%i WHERE steamid='%s'", g_bHitBlip[client] ? 1 : 0, g_sPlayerSteamID[client]);
-		SQL_TQuery(db, SQLErrorCheckCallback, query);
+		db.Query(SQLErrorCheckCallback, query);
 	}
 
 	PrintToChat(client, "\x01Hitblip is \x04%sabled\x01.", g_bHitBlip[client]?"en":"dis");
@@ -3053,7 +3053,7 @@ public Action Command_ConnectionTest(int client, int args) {
 
 	char query[256];
 	Format(query, sizeof(query), "SELECT rating FROM mgemod_stats LIMIT 1");
-	SQL_TQuery(db, T_SQL_Test, query, client);
+	db.Query(T_SQL_Test, query, client);
 
 	return Plugin_Handled;
 }
@@ -3329,7 +3329,7 @@ void PrepareSQL() { // Opens the connection to the database, and creates the tab
 	}
 
 	char ident[16];
-	SQL_ReadDriver(db, ident, sizeof(ident));
+	db.Driver.GetIdentifier(ident, sizeof(ident));
 
 	if (StrEqual(ident, "mysql", false)) {
 		g_bUseSQLite = false;
@@ -3340,18 +3340,18 @@ void PrepareSQL() { // Opens the connection to the database, and creates the tab
 	}
 
 	if (g_bUseSQLite) {
-		SQL_TQuery(db, SQLErrorCheckCallback, "CREATE TABLE IF NOT EXISTS mgemod_stats (rating INTEGER, steamid TEXT, name TEXT, wins INTEGER, losses INTEGER, lastplayed INTEGER, hitblip INTEGER)");
-		SQL_TQuery(db, SQLErrorCheckCallback, "CREATE TABLE IF NOT EXISTS mgemod_duels (winner TEXT, loser TEXT, winnerscore INTEGER, loserscore INTEGER, winlimit INTEGER, gametime INTEGER, mapname TEXT, arenaname TEXT) ");
-		SQL_TQuery(db, SQLErrorCheckCallback, "CREATE TABLE IF NOT EXISTS mgemod_duels_2v2 (winner TEXT, winner2 TEXT, loser TEXT, loser2 TEXT, winnerscore INTEGER, loserscore INTEGER, winlimit INTEGER, gametime INTEGER, mapname TEXT, arenaname TEXT) ");
+		db.Query(SQLErrorCheckCallback, "CREATE TABLE IF NOT EXISTS mgemod_stats (rating INTEGER, steamid TEXT, name TEXT, wins INTEGER, losses INTEGER, lastplayed INTEGER, hitblip INTEGER)");
+		db.Query(SQLErrorCheckCallback, "CREATE TABLE IF NOT EXISTS mgemod_duels (winner TEXT, loser TEXT, winnerscore INTEGER, loserscore INTEGER, winlimit INTEGER, gametime INTEGER, mapname TEXT, arenaname TEXT) ");
+		db.Query(SQLErrorCheckCallback, "CREATE TABLE IF NOT EXISTS mgemod_duels_2v2 (winner TEXT, winner2 TEXT, loser TEXT, loser2 TEXT, winnerscore INTEGER, loserscore INTEGER, winlimit INTEGER, gametime INTEGER, mapname TEXT, arenaname TEXT) ");
 	} else {
-		SQL_TQuery(db, SQLErrorCheckCallback, "CREATE TABLE IF NOT EXISTS mgemod_stats (rating INT(4) NOT NULL, steamid VARCHAR(32) NOT NULL, name VARCHAR(64) NOT NULL, wins INT(4) NOT NULL, losses INT(4) NOT NULL, lastplayed INT(11) NOT NULL, hitblip INT(2) NOT NULL) DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB ");
-		SQL_TQuery(db, SQLErrorCheckCallback, "CREATE TABLE IF NOT EXISTS mgemod_duels (winner VARCHAR(32) NOT NULL, loser VARCHAR(32) NOT NULL, winnerscore INT(4) NOT NULL, loserscore INT(4) NOT NULL, winlimit INT(4) NOT NULL, gametime INT(11) NOT NULL, mapname VARCHAR(64) NOT NULL, arenaname VARCHAR(32) NOT NULL) DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB ");
-		SQL_TQuery(db, SQLErrorCheckCallback, "CREATE TABLE IF NOT EXISTS mgemod_duels_2v2 (winner VARCHAR(32) NOT NULL, winner2 VARCHAR(32) NOT NULL, loser VARCHAR(32) NOT NULL, loser2 VARCHAR(32) NOT NULL, winnerscore INT(4) NOT NULL, loserscore INT(4) NOT NULL, winlimit INT(4) NOT NULL, gametime INT(11) NOT NULL, mapname VARCHAR(64) NOT NULL, arenaname VARCHAR(32) NOT NULL) DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB ");
+		db.Query(SQLErrorCheckCallback, "CREATE TABLE IF NOT EXISTS mgemod_stats (rating INT(4) NOT NULL, steamid VARCHAR(32) NOT NULL, name VARCHAR(64) NOT NULL, wins INT(4) NOT NULL, losses INT(4) NOT NULL, lastplayed INT(11) NOT NULL, hitblip INT(2) NOT NULL) DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB ");
+		db.Query(SQLErrorCheckCallback, "CREATE TABLE IF NOT EXISTS mgemod_duels (winner VARCHAR(32) NOT NULL, loser VARCHAR(32) NOT NULL, winnerscore INT(4) NOT NULL, loserscore INT(4) NOT NULL, winlimit INT(4) NOT NULL, gametime INT(11) NOT NULL, mapname VARCHAR(64) NOT NULL, arenaname VARCHAR(32) NOT NULL) DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB ");
+		db.Query(SQLErrorCheckCallback, "CREATE TABLE IF NOT EXISTS mgemod_duels_2v2 (winner VARCHAR(32) NOT NULL, winner2 VARCHAR(32) NOT NULL, loser VARCHAR(32) NOT NULL, loser2 VARCHAR(32) NOT NULL, winnerscore INT(4) NOT NULL, loserscore INT(4) NOT NULL, winlimit INT(4) NOT NULL, gametime INT(11) NOT NULL, mapname VARCHAR(64) NOT NULL, arenaname VARCHAR(32) NOT NULL) DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB ");
 	}
 	
 }
 
-public void T_SQLQueryOnConnect(Handle owner, Handle hndl, const char[] error, any data) {
+public void T_SQLQueryOnConnect(Database owner, DBResultSet hndl, const char[] error, any data) {
 	int client = data;
 
 	if (hndl == null) {
@@ -3367,23 +3367,23 @@ public void T_SQLQueryOnConnect(Handle owner, Handle hndl, const char[] error, a
 	char query[512];
 	char namesql_dirty[MAX_NAME_LENGTH], namesql[(MAX_NAME_LENGTH * 2) + 1];
 	GetClientName(client, namesql_dirty, sizeof(namesql_dirty));
-	SQL_EscapeString(db, namesql_dirty, namesql, sizeof(namesql));
+	db.Escape(namesql_dirty, namesql, sizeof(namesql));
 
-	if (SQL_FetchRow(hndl)) {
-		g_iPlayerRating[client] = SQL_FetchInt(hndl, 0);
-		g_bHitBlip[client] = SQL_FetchInt(hndl, 1) == 1;
-		g_iPlayerWins[client] = SQL_FetchInt(hndl, 2);
-		g_iPlayerLosses[client] = SQL_FetchInt(hndl, 3);
+	if (hndl.FetchRow()) {
+		g_iPlayerRating[client] = hndl.FetchInt(0);
+		g_bHitBlip[client] = hndl.FetchInt(1) == 1;
+		g_iPlayerWins[client] = hndl.FetchInt(2);
+		g_iPlayerLosses[client] = hndl.FetchInt(3);
 
 		Format(query, sizeof(query), "UPDATE mgemod_stats SET name='%s' WHERE steamid='%s'", namesql, g_sPlayerSteamID[client]);
-		SQL_TQuery(db, SQLErrorCheckCallback, query);
+		db.Query(SQLErrorCheckCallback, query);
 	} else {
 		if (g_bUseSQLite) {
 			Format(query, sizeof(query), "INSERT INTO mgemod_stats VALUES(1600, '%s', '%s', 0, 0, %i, 1)", g_sPlayerSteamID[client], namesql, GetTime());
-			SQL_TQuery(db, SQLErrorCheckCallback, query);
+			db.Query(SQLErrorCheckCallback, query);
 		} else {
 			Format(query, sizeof(query), "INSERT INTO mgemod_stats (rating, steamid, name, wins, losses, lastplayed, hitblip) VALUES (1600, '%s', '%s', 0, 0, %i, 1)", g_sPlayerSteamID[client], namesql, GetTime());
-			SQL_TQuery(db, SQLErrorCheckCallback, query);
+			db.Query(SQLErrorCheckCallback, query);
 		}
 
 		g_iPlayerRating[client] = 1600;
@@ -3391,7 +3391,7 @@ public void T_SQLQueryOnConnect(Handle owner, Handle hndl, const char[] error, a
 	}
 }
 
-public void T_SQL_Top5(Handle owner, Handle hndl, const char[] error, any data) {
+public void T_SQL_Top5(Database owner, DBResultSet hndl, const char[] error, any data) {
 	int client = data;
 	
 	if (hndl == null) {
@@ -3404,18 +3404,18 @@ public void T_SQL_Top5(Handle owner, Handle hndl, const char[] error, any data) 
 		return;
 	}
 
-	if (SQL_GetRowCount(hndl) == 5) {
+	if (hndl.RowCount == 5) {
 		int rating[5]; 
 		char name[5][MAX_NAME_LENGTH]; 
 		int i = 0;
 
-		while (SQL_FetchRow(hndl)) {
+		while (hndl.FetchRow()) {
 			if (i > 5) {
 				break;
 			}
 
-			SQL_FetchString(hndl, 1, name[i], 64);
-			rating[i] = SQL_FetchInt(hndl, 0);
+			hndl.FetchString(1, name[i], 64);
+			rating[i] = hndl.FetchInt(0);
 
 			i++;
 		}
@@ -3427,7 +3427,7 @@ public void T_SQL_Top5(Handle owner, Handle hndl, const char[] error, any data) 
 
 }
 
-public void T_SQL_Test(Handle owner, Handle hndl, const char[] error, any data) {
+public void T_SQL_Test(Database owner, DBResultSet hndl, const char[] error, any data) {
 	int client = data;
 
 	if (hndl == null) {
@@ -3441,14 +3441,14 @@ public void T_SQL_Test(Handle owner, Handle hndl, const char[] error, any data) 
 		return;
 	}
 
-	if (SQL_FetchRow(hndl)) {
+	if (hndl.FetchRow()) {
 		PrintToChat(client, "\x01Database is \x04Up\x01.");
 	} else {
 		PrintToChat(client, "\x01Database is \x04Down\x01.");
 	}
 }
 
-public void SQLErrorCheckCallback(Handle owner, Handle hndl, const char[] error, any data) {
+public void SQLErrorCheckCallback(Database owner, DBResultSet hndl, const char[] error, any data) {
 	if (!StrEqual("", error)) {
 		LogError("Query failed: %s", error);
 
@@ -3469,7 +3469,7 @@ public void SQLErrorCheckCallback(Handle owner, Handle hndl, const char[] error,
 	}
 }
 
-public void SQLDbConnTest(Handle owner, Handle hndl, const char[] error, any data) {
+public void SQLDbConnTest(Database owner, DBResultSet hndl, const char[] error, any data) {
 	if (!StrEqual("", error)) {
 		LogError("Query failed: %s", error);
 		LogError("Database reconnect failed, next attempt in %i minutes.", g_iReconnectInterval);
@@ -3479,17 +3479,17 @@ public void SQLDbConnTest(Handle owner, Handle hndl, const char[] error, any dat
 			g_hDBReconnectTimer = CreateTimer(float(60 * g_iReconnectInterval), Timer_ReconnectToDB, TIMER_FLAG_NO_MAPCHANGE);
 		}
 	} else {
-		g_bNoStats = (GetConVarBool(gcvar_stats)) ? false : true;
+		g_bNoStats = gcvar_stats.BoolValue ? false : true;
 
 		if (!g_bNoStats) {
 			for (int i = 1; i <= MaxClients; i++) {
 				if (IsValidClient(i)) {
 					char steamid_dirty[31], steamid[64], query[256];
 					GetClientAuthId(i, AuthId_Steam2, steamid_dirty, sizeof(steamid_dirty));
-					SQL_EscapeString(db, steamid_dirty, steamid, sizeof(steamid));
+					db.Escape(steamid_dirty, steamid, sizeof(steamid));
 					strcopy(g_sPlayerSteamID[i], 32, steamid);
 					Format(query, sizeof(query), "SELECT rating, hitblip, wins, losses FROM mgemod_stats WHERE steamid='%s' LIMIT 1", steamid);
-					SQL_TQuery(db, T_SQLQueryOnConnect, query, i);
+					db.Query(T_SQLQueryOnConnect, query, i);
 				}
 			}
 
@@ -3527,7 +3527,7 @@ public void Event_PlayerSpawn(Handle event, const char[] name, bool dontBroadcas
 
 	if (!g_bFourPersonArena[arena_index] && g_iPlayerSlot[client] != SLOT_ONE && g_iPlayerSlot[client] != SLOT_TWO) {
 		ChangeClientTeam(client, TEAM_SPEC);
-	} else if (g_bFourPersonArena[arena_index] && g_iPlayerSlot[client] != SLOT_ONE && g_iPlayerSlot[client] != SLOT_TWO && (g_iPlayerSlot[client]!=SLOT_THREE && g_iPlayerSlot[client]!=SLOT_FOUR)) {
+	} else if (g_bFourPersonArena[arena_index] && g_iPlayerSlot[client] != SLOT_ONE && g_iPlayerSlot[client] != SLOT_TWO && (g_iPlayerSlot[client] != SLOT_THREE && g_iPlayerSlot[client] != SLOT_FOUR)) {
 		ChangeClientTeam(client, TEAM_SPEC);
 	}
 		
@@ -4203,7 +4203,7 @@ public Action Timer_Tele(Handle timer, any userid) {
 	}
 	
 	int player_slot = g_iPlayerSlot[client];
-	if ((!g_bFourPersonArena[arena_index] && player_slot>SLOT_TWO) || (g_bFourPersonArena[arena_index] && player_slot>SLOT_FOUR)) {
+	if ((!g_bFourPersonArena[arena_index] && player_slot > SLOT_TWO) || (g_bFourPersonArena[arena_index] && player_slot > SLOT_FOUR)) {
 		return;
 	}
 
@@ -4274,7 +4274,7 @@ public Action Timer_Tele(Handle timer, any userid) {
 	
 	// Now when the array is gone through sequentially, it will still provide a random spawn.
 	float besteffort_dist;
-	int besteffort_spawn;
+	int besteffort_spawn = -1;
 	for (int i = 0; i < g_iArenaSpawns[arena_index]; i++) {
 		int client_slot = g_iPlayerSlot[client];
 		int foe_slot = (client_slot == SLOT_ONE || client_slot == SLOT_THREE) ? SLOT_TWO : SLOT_ONE;
@@ -4298,7 +4298,7 @@ public Action Timer_Tele(Handle timer, any userid) {
 		}
 	}
 
-	if (besteffort_spawn) {
+	if (besteffort_spawn != -1) {
 		// Couldn't find a spawn that was far enough away, so use the one that was the farthest.
 		TeleportEntity(client, g_fArenaSpawnOrigin[arena_index][besteffort_spawn], g_fArenaSpawnAngles[arena_index][besteffort_spawn], vel);
 		EmitAmbientSound("items/spawn_item.wav", g_fArenaSpawnOrigin[arena_index][besteffort_spawn], _, SNDLEVEL_NORMAL, _, 1.0);
@@ -4441,10 +4441,11 @@ public Action Timer_DeleteParticle(Handle timer, any particle) {
 	}
 }
 
-public Action Timer_AddBotInQueue(Handle timer, Handle pk) {
-	ResetPack(pk);
-	int client = GetClientOfUserId(ReadPackCell(pk));
-	int arena_index = ReadPackCell(pk);
+public Action Timer_AddBotInQueue(Handle timer, DataPack pk) {
+	pk.Reset();
+	int client = GetClientOfUserId(pk.ReadCell());
+	int arena_index = ReadPackCell(pk.ReadCell());
+	delete pk;
 	AddInQueue(client, arena_index);
 }
 
@@ -4457,7 +4458,7 @@ public Action Timer_ReconnectToDB(Handle timer) {
 
 	char query[256];
 	Format(query, sizeof(query), "SELECT rating FROM mgemod_stats LIMIT 1");
-	SQL_TQuery(db, SQLDbConnTest, query);
+	db.Query(SQLDbConnTest, query);
 }
 
 public Action Timer_CountDownKoth(Handle timer, any arena_index) {
@@ -4832,7 +4833,7 @@ float DistanceAboveGround(int victim) {
 		LogError("trace error. victim %N(%d)", victim, victim);
 	}
 
-	CloseHandle(trace);
+	delete trace;
 	return distance;
 }
 
@@ -4861,7 +4862,7 @@ float DistanceAboveGroundAroundPlayer(int victim) {
 			} else {
 				LogError("trace error. victim %N(%d)", victim, victim);
 			}
-			CloseHandle(trace);
+			delete trace;
 		} else if (i == 1) {
 			tvStart[0] = tvStart[0] + 10;
 			Handle trace = TR_TraceRayFilterEx(tvStart, vAngles, MASK_PLAYERSOLID, RayType_Infinite, TraceEntityFilterPlayer);
@@ -4872,7 +4873,7 @@ float DistanceAboveGroundAroundPlayer(int victim) {
 			} else {
 				LogError("trace error. victim %N(%d)", victim, victim);
 			}
-			CloseHandle(trace);
+			delete trace;
 		} else if (i == 2) {
 			tvStart[0] = tvStart[0] - 10;
 			Handle trace = TR_TraceRayFilterEx(tvStart, vAngles, MASK_PLAYERSOLID, RayType_Infinite, TraceEntityFilterPlayer);
@@ -4883,7 +4884,7 @@ float DistanceAboveGroundAroundPlayer(int victim) {
 			} else {
 				LogError("trace error. victim %N(%d)", victim, victim);
 			}
-			CloseHandle(trace);
+			delete trace;
 		} else if (i == 3) {
 			tvStart[1] = vStart[1] + 10;
 			Handle trace = TR_TraceRayFilterEx(tvStart, vAngles, MASK_PLAYERSOLID, RayType_Infinite, TraceEntityFilterPlayer);
@@ -4894,7 +4895,7 @@ float DistanceAboveGroundAroundPlayer(int victim) {
 			} else {
 				LogError("trace error. victim %N(%d)", victim, victim);
 			}
-			CloseHandle(trace);
+			delete trace;
 		} else if (i == 4) {
 			tvStart[1] = vStart[1] - 10;
 			Handle trace = TR_TraceRayFilterEx(tvStart, vAngles, MASK_PLAYERSOLID, RayType_Infinite, TraceEntityFilterPlayer);
@@ -4905,9 +4906,8 @@ float DistanceAboveGroundAroundPlayer(int victim) {
 			} else {
 				LogError("trace error. victim %N(%d)", victim, victim);
 			}
-			CloseHandle(trace);
+			delete trace;
 		}
-		
 		if ((tempDist > -1 && tempDist < minDist) || minDist == -1) {
 				minDist = tempDist;
 		}
